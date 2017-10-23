@@ -49,4 +49,14 @@ contract MintableToken is StandardToken, Ownable {
     MintFinished();
     return true;
   }
+
+  /**
+   * @dev Function to start minting new tokens.
+   * @return True if the operation was successful.
+   */
+  function startMinting() onlyOwner public returns (bool) {
+    mintingFinished = false;
+    MintStarted();
+    return true;
+  }
 }
