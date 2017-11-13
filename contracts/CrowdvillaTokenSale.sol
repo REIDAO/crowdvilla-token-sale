@@ -5,9 +5,12 @@ contract CrowdvillaTokenSale {
   uint public totalFund;
   uint public uniqueContributors;
   uint public currentStretchGoal;
+  uint public minContribution = 1 ether;
   uint public recvPerEth = 400 * 10**8;
   uint public mgmtFeePercentage = 20;
-  uint[] public stretchGoals = [3 ether, 7 ether, 12 ether];
+  uint public saleStartBlock;
+  uint public saleEndBlock;
+  uint[] public stretchGoals = [100000 ether, 2500000 ether, 5000000 ether];
 
   mapping (uint => uint) public contributionsPerStretchGoal;
   mapping (address => mapping (uint => uint)) public contributions;
@@ -16,18 +19,51 @@ contract CrowdvillaTokenSale {
 
   event Contribute(address indexed contributor, uint amount);
 
-  function () public payable {
-    totalFund += msg.value;
-    contributions[msg.sender][currentStretchGoal] += msg.value;
-    contributionsPerStretchGoal[currentStretchGoal] += msg.value;
-    Contribute(msg.sender, msg.value);
-    if (currentStretchGoal < stretchGoals.length && totalFund >= stretchGoals[currentStretchGoal])
-      currentStretchGoal++;
+  enum State { Initial, TokenSale, End, Collection }
+  State public state;
 
-    if (contributorIndex[msg.sender]==0) {
-      uniqueContributors++;
-      contributorIndex[msg.sender] = uniqueContributors;
-      reversedContributorIndex[uniqueContributors] = msg.sender;
+  function CrowdvillaTokenSale() {
+    state = State.Initial;
+    saleStartBlock = 40000000;
+    saleEndBlock   = 45000000;
+  }
+
+  function () public payable {
+    if (msg.value>0) {
+      // for accepting fund
+      require(msg.value >= minContribution);
+      require(state == State.Initial || state == State.TokenSale);
+
+      if (state == State.Initial && block.number >= saleStartBlock) {
+        state = State.TokenSale;
+      }
+      if (state == State.TokenSale) {
+        if (block.number >= saleEndBlock) {
+          setEndState();
+          msg.sender.transfer(msg.value);
+        } else {
+          totalFund += msg.value;
+          contributions[msg.sender][currentStretchGoal] += msg.value;
+          contributionsPerStretchGoal[currentStretchGoal] += msg.value;
+          Contribute(msg.sender, msg.value);
+          if (totalFund >= stretchGoals[currentStretchGoal]) {
+            currentStretchGoal++;
+          }
+
+          if (currentStretchGoal == stretchGoals.length) {
+            setEndState();
+          }
+
+          if (contributorIndex[msg.sender]==0) {
+            uniqueContributors++;
+            contributorIndex[msg.sender] = uniqueContributors;
+            reversedContributorIndex[uniqueContributors] = msg.sender;
+          }
+        }
+      }
+    } else {
+      require(state == State.Collection);
+      // for tokens collection
     }
   }
 
@@ -47,5 +83,19 @@ contract CrowdvillaTokenSale {
     uint total = (val * 100) / (100 - mgmtFeePercentage);
     val = total - val;
     return val;
+  }
+
+  function adminUpdateSaleEndBlock (uint _saleEndBlock) {
+    //TODO add access-control
+    saleEndBlock = _saleEndBlock;
+  }
+
+  function adminSetSendState() {
+    //TODO add access-control
+    setEndState();
+  }
+
+  function setEndState() private {
+    state = State.End;
   }
 }
