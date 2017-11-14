@@ -6,7 +6,7 @@ contract CrowdvillaTokenSale {
   uint public uniqueContributors;
   uint public currentStretchGoal;
   uint public minContribution = 1 ether;
-  uint public recvPerEth = 400 * 10**8;
+  uint public rcvPerEth = 400 * 10**8;
   uint public mgmtFeePercentage = 20;
   uint public saleStartBlock;
   uint public saleEndBlock;
@@ -67,10 +67,10 @@ contract CrowdvillaTokenSale {
     }
   }
 
-  function getPromisedTokenAmount() public constant returns (uint) {
+  function getPromisedCRVTokenAmount() public constant returns (uint) {
     uint val;
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val += (contributions[msg.sender][i] * recvPerEth * (100 + ((currentStretchGoal-i) * 10))/100) / 1 ether;
+      val += (contributions[msg.sender][i] * rcvPerEth * (100 + ((currentStretchGoal-i) * 10))/100) / 1 ether;
     }
     return val;
   }
@@ -78,7 +78,7 @@ contract CrowdvillaTokenSale {
   function getMgmtFeeTokenAmount() public constant returns (uint) {
     uint val;
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val += (contributionsPerStretchGoal[i] * recvPerEth * (100 + ((currentStretchGoal-i) * 10))/100) / 1 ether;
+      val += (contributionsPerStretchGoal[i] * rcvPerEth * (100 + ((currentStretchGoal-i) * 10))/100) / 1 ether;
     }
     uint total = (val * 100) / (100 - mgmtFeePercentage);
     val = total - val;
