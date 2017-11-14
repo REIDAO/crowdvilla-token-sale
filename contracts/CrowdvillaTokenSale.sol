@@ -45,7 +45,7 @@ contract CrowdvillaTokenSale {
           totalFund += msg.value;
           contributions[msg.sender][currentStretchGoal] += msg.value;
           contributionsPerStretchGoal[currentStretchGoal] += msg.value;
-          Contribute(msg.sender, msg.value);
+          logContributeEvent(msg.sender, msg.value);
           if (totalFund >= stretchGoals[currentStretchGoal]) {
             currentStretchGoal++;
           }
@@ -97,5 +97,8 @@ contract CrowdvillaTokenSale {
 
   function setEndState() private {
     state = State.End;
+  }
+  function logContributeEvent(address _contributor, uint _amount) internal {
+    Contribute(_contributor, _amount);
   }
 }
