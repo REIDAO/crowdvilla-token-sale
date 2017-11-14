@@ -13,6 +13,8 @@ contract CrowdvillaTokenSale {
   uint public saleEndBlock;
   uint[] public stretchGoals = [100000 ether, 2500000 ether, 5000000 ether];
 
+  address public whitelister;
+  mapping (address => bool) public whitelist;
   mapping (uint => uint) public contributionsPerStretchGoal;
   mapping (address => mapping (uint => uint)) public contributions;
   mapping (address => uint) public contributorIndex;
@@ -27,11 +29,15 @@ contract CrowdvillaTokenSale {
     state = State.Initial;
     saleStartBlock = 40000000;
     saleEndBlock   = 45000000;
+
+    //TODO add whitelister
+    whitelister = address(0x0);
   }
 
   function () public payable {
     if (msg.value>0) {
       // for accepting fund
+      require(isInWhitelist(msg.sender));
       require(msg.value >= minContribution);
       require(state == State.Initial || state == State.TokenSale);
 
@@ -99,6 +105,69 @@ contract CrowdvillaTokenSale {
   function setEndState() internal {
     state = State.End;
   }
+
+  /**
+   * @dev Allows authorized signatories to update `_new` as new whitelister.
+   * @param _whitelister address The address of new whitelister.
+   */
+  function adminUpdateWhitelister(address _whitelister) {
+    //TODO add access-control
+    whitelister = _whitelister;
+  }
+
+  /**
+   * @dev Allows whitelister to add `_contributor` to the whitelist.
+   * @param _contributor address The address of contributor.
+   */
+  function addToWhitelist(address _contributor) whitelisterOnly {
+    whitelist[_contributor] = true;
+  }
+
+  /**
+   * @dev Allows authorized signatories to update contributor address.
+   * @param _old address the old contributor address.
+   * @param _new address the new contributor address.
+   */
+  function adminUpdateContributorAddress(address _old, address _new) {
+    //TODO add access-control
+    require (state != State.Collection);
+    removeFromWhitelist(_old);
+    addToWhitelist(_new);
+    uint currentContribution;
+    for (uint i=0; i<=currentStretchGoal; i++) {
+      currentContribution = contributions[_old][i];
+      if (currentContribution > 0) {
+        contributions[_old][i] = 0;
+        contributions[_new][i] += currentContribution;
+        logContributeEvent(_new, currentContribution);
+      }
+    }
+  }
+
+  /**
+   * @dev Allows authorized signatories to remove `_contributor` from the whitelist.
+   * @param _contributor address The address of contributor.
+   */
+  function removeFromWhitelist(address _contributor) internal {
+    whitelist[_contributor] = false;
+  }
+
+  /**
+   * @dev Checks if `_contributor` is in the whitelist.
+   * @param _contributor address The address of contributor.
+   */
+  function isInWhitelist(address _contributor) constant returns (bool) {
+    return (whitelist[_contributor] == true);
+  }
+
+  /**
+   * @dev Modifier that throws if sender is not whitelister.
+   */
+  modifier whitelisterOnly {
+    require(msg.sender == whitelister);
+    _;
+  }
+
   function getPromisedREITokenAmount() public constant returns (uint) {
     uint val;
     uint totalEthContributions;
