@@ -7,6 +7,7 @@ contract CrowdvillaTokenSale {
   uint public currentStretchGoal;
   uint public minContribution = 1 ether;
   uint public rcvPerEth = 400 * 10**8;
+  uint public reiPerEth = 5 * 10**8;
   uint public mgmtFeePercentage = 20;
   uint public saleStartBlock;
   uint public saleEndBlock;
@@ -98,6 +99,17 @@ contract CrowdvillaTokenSale {
   function setEndState() private {
     state = State.End;
   }
+  function getPromisedREITokenAmount() public constant returns (uint) {
+    uint val;
+    uint totalEthContributions;
+    for (uint i=0; i<=currentStretchGoal; i++) {
+      totalEthContributions += contributions[msg.sender][i];
+    }
+    val = totalEthContributions * reiPerEth / 1 ether;
+
+    return val;
+  }
+
   function logContributeEvent(address _contributor, uint _amount) internal {
     Contribute(_contributor, _amount);
   }
