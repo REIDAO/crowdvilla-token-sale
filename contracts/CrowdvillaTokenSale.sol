@@ -96,7 +96,7 @@ contract CrowdvillaTokenSale {
     setEndState();
   }
 
-  function setEndState() private {
+  function setEndState() internal {
     state = State.End;
   }
   function getPromisedREITokenAmount() public constant returns (uint) {
