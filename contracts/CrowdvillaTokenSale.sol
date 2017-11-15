@@ -16,6 +16,7 @@ contract CrowdvillaTokenSale {
   address public whitelister;
   mapping (address => bool) public whitelist;
   mapping (uint => uint) public contributionsPerStretchGoal;
+  mapping (address => uint) public contributionsPerAddress;
   mapping (address => mapping (uint => uint)) public contributions;
   mapping (address => uint) public contributorIndex;
   mapping (uint => address) public reversedContributorIndex;
@@ -52,6 +53,7 @@ contract CrowdvillaTokenSale {
           totalFund += msg.value;
           contributions[msg.sender][currentStretchGoal] += msg.value;
           contributionsPerStretchGoal[currentStretchGoal] += msg.value;
+          contributionsPerAddress[msg.sender] += msg.value;
           logContributeEvent(msg.sender, msg.value);
           if (totalFund >= stretchGoals[currentStretchGoal]) {
             currentStretchGoal++;
@@ -139,6 +141,8 @@ contract CrowdvillaTokenSale {
       if (currentContribution > 0) {
         contributions[_old][i] = 0;
         contributions[_new][i] += currentContribution;
+        contributionsPerAddress[_old] -= currentContribution;
+        contributionsPerAddress[_new] += currentContribution;
         logContributeEvent(_new, currentContribution);
       }
     }
