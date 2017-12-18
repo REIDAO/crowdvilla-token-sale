@@ -12,44 +12,13 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
   mapping (address => TokenLock[]) public locks;
 
   /**
-   * @dev Allows authorized callers to transfer `_value` tokens to `_to`, and lock them until timestamp `_lockUntil`.
-   * @param _to address The address to be locked.
-   * @param _value uint The amout of tokens to be locked.
-   * @param _lockUntil uint The UNIX timestamp tokens are locked until.
-   */
-  function adminTransferAndLockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
-    require(_lockUntil > now);
-    adminTransfer(_to, _value);
-    adminLockTokens(_to, _value, _lockUntil);
-  }
-
-  /**
-   * @dev Allows authorized callers to transfer the tokens. To be called before trading started.
-   * @param _to address The recipient address of the tokens.
-   * @param _value uint The amount of tokens to be transfered.
-   */
-  function adminTransfer(address _to, uint256 _value) public ownerOnly returns (bool) {
-    return super.transfer(_to, _value);
-  }
-
-  /**
-   * @dev Allows authorized callers to transfer `_value` amount of tokens (transfer-eligible) once trading has started.
-   * @param _from address The sender address of the tokens.
-   * @param _to address The recipient address of the tokens.
-   * @param _value uint The amount of tokens to be transfered.
-   */
-  function adminTransferFrom(address _from, address _to, uint256 _value) public ownerOnly returns (bool) {
-    return super.transferFrom(_from, _to, _value);
-  }
-
-  /**
    * @dev Allows authorized callers to lock `_value` tokens belong to `_to` until timestamp `_lockUntil`.
    * This function can be called independently of transferAndLockTokens(), hence the double checking of timestamp.
    * @param _to address The address to be locked.
    * @param _value uint The amout of tokens to be locked.
    * @param _lockUntil uint The UNIX timestamp tokens are locked until.
    */
-  function adminLockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
+  function lockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
     require(_value <= balanceOf(_to));
     require(_lockUntil > now);
     locks[_to].push(TokenLock(_value, _lockUntil));
@@ -61,17 +30,17 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    * @param _value uint The amout of tokens to be minted and locked.
    * @param _lockUntil uint The UNIX timestamp tokens are locked until.
    */
-  function adminMintAndLockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
+  function mintAndLockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
     require(_lockUntil > now);
     mint(_to, _value);
-    adminLockTokens(_to, _value, _lockUntil);
+    lockTokens(_to, _value, _lockUntil);
   }
 
   /**
    * @dev Checks the amount of transferable tokens belongs to `_holder`.
    * @param _holder address The address to be checked.
    */
-  function transferableTokens(address _holder) internal constant returns (uint256) {
+  function transferableTokens(address _holder) public constant returns (uint256) {
     uint256 lockedTokens = getLockedTokens(_holder);
     if (lockedTokens==0) {
       return balanceOf(_holder);
