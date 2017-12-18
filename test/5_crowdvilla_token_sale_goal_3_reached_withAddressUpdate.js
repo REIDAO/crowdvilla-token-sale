@@ -479,10 +479,6 @@ contract('All', function(accounts) {
   });
 });
 
-function getSum(total, num) {
-    return total + num;
-}
-
 function log(msg)
 {
   if (loggingEnabled)
