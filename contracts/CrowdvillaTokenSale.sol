@@ -112,8 +112,8 @@ contract CrowdvillaTokenSale is Owners {
           //no referral code
           crowdvillaWallet.transfer(msg.value);
         } else {
-          //referral code exist, sending 95% to our wallet. 5% to multisig with arbiter
-          uint crowdvillaAmount = (msg.value.mul(95)).div(100);
+          //referral code exist, sending 99% to our wallet. 1% to multisig with arbiter
+          uint crowdvillaAmount = (msg.value.mul(99)).div(100);
           crowdvillaWallet.transfer(crowdvillaAmount);
           referralMultisig[referralCode].transfer(msg.value.sub(crowdvillaAmount));
         }
