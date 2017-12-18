@@ -11,20 +11,23 @@ contract REIToken is REIDAOMintableToken {
 
   function assignToREIDAO() public ownerOnly {
     uint index;
-    uint amount = 200000 * 10**8;
-    if (block.timestamp >= 1609459200) {
-      //after 01/01/2021 @ 12:00am (UTC)
+    uint amount = 200000 * 10**decimals;
+    if (block.timestamp >= 1640995200) {
+      //for WAVE 4
+      //after 01/01/2022 @ 12:00am (UTC)
       index = 0;
-    } else if (block.timestamp >= 1577836800) {
-      //after 01/01/2020 @ 12:00am (UTC)
+      amount = 150000 * 10**decimals;
+    } else if (block.timestamp >= 1609459200) {
+      //for WAVE 3
+      //after 01/01/2021 @ 12:00am (UTC)
       index = 1;
-    } else if (block.timestamp >= 1546300800) {
-      //after 01/01/2019 @ 12:00am (UTC)
+    } else if (block.timestamp >= 1577836800) {
+      //for WAVE 2
+      //after 01/01/2020 @ 12:00am (UTC)
       index = 2;
     } else {
-      //for current assignment
+      //for WAVE 1
       index = 3;
-      amount = 150000 * 10**8;
     }
     require(!tokensReleased[index]);
     mint(walletREIDAO, amount);
