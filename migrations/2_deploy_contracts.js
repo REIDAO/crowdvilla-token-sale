@@ -62,3 +62,9 @@ module.exports = function(deployer, network, accounts) {
   })
   ;
 };
+
+/*
+NOTE:
+- For Testing, use stretch-goals 4, 7, 10
+- For Live Deployment, use stretch-goals 100000, 250000, 500000
+ */
