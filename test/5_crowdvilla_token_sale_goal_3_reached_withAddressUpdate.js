@@ -158,6 +158,18 @@ contract('All', function(accounts) {
     ;
   });
 
+  it("Total Referral Contribution CODE1 should be " + contributionInEther * 2 + " ETH", function() {
+    //CODE1 - "0xef46135efb976e4cd578b5c01186aebd39616086b58dd3a44364b7a80b1b8b61"
+    var referralCode = "CODE1";
+    var hexVal = web3.fromAscii(referralCode);
+    var toSha3Val = hexVal + "0".repeat(64-hexVal.length+2);
+    return CrowdvillaTokenSaleInstance.referralContribution(web3.sha3(toSha3Val, {encoding:'hex'}))
+    .then(function(result) {
+      assert.equal(result.valueOf(), contributionAmount * 2);
+    })
+    ;
+  });
+
   it("CrowdvillaTokenSale - Account #3 | Promised REI should be " + contributionInEther * 5 + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedREITokenAmount(accounts[3])
     .then(function(result) {

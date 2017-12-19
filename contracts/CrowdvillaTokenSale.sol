@@ -34,6 +34,7 @@ contract CrowdvillaTokenSale is Owners {
   mapping (address => uint) public contributorIndex;
   mapping (uint => address) public reversedContributorIndex;
   mapping (address => bool) public tokensCollected;
+  mapping (bytes32 => uint) public referralContribution;
 
   event Contribute(uint blkNo, uint blkTs, address indexed contributor, address indexed tokensale, uint amount, bytes32 referralCode);
   event Whitelisted(uint blkNo, uint blkTs, address indexed contributor, bool isEarlyRegistrant, bytes32 referralCode);
@@ -106,6 +107,7 @@ contract CrowdvillaTokenSale is Owners {
         contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal] = contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal].add(msg.value);
         contributionsPerAddress[msg.sender] = contributionsPerAddress[msg.sender].add(msg.value);
         bytes32 referralCode = whitelist[msg.sender].referralCode;
+        referralContribution[referralCode] = referralContribution[referralCode].add(msg.value);
         logContributeEvent(msg.sender, msg.value, referralCode);
 
         if (referralCode == bytes32(0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563)) {
