@@ -6,31 +6,54 @@ contract REIToken is REIDAOMintableToken {
   string public name = "REI Token";
   string public symbol = "REI";
 
+  address public wallet;
   mapping (uint => bool) tokensReleased;
-  address walletREIDAO = 0x19BBe5157ffdf6Efa4C84810e7d2AE25832fF45D;
+  event WaveReleased(uint wave, uint amount);
 
-  function assignToREIDAO() public ownerOnly {
+  function REIToken(address _wallet) public {
+    wallet = _wallet;
+  }
+
+  function changeWallet(address _wallet) public ownerOnly {
+    wallet = _wallet;
+  }
+
+  function disburseToREIDAO() public ownerOnly {
     uint index;
     uint amount = 200000 * 10**decimals;
-    if (block.timestamp >= 1640995200) {
-      //for WAVE 4
-      //after 01/01/2022 @ 12:00am (UTC)
-      index = 0;
-      amount = 150000 * 10**decimals;
-    } else if (block.timestamp >= 1609459200) {
-      //for WAVE 3
-      //after 01/01/2021 @ 12:00am (UTC)
-      index = 1;
-    } else if (block.timestamp >= 1577836800) {
-      //for WAVE 2
-      //after 01/01/2020 @ 12:00am (UTC)
-      index = 2;
+    bool toMint;
+    if (!tokensReleased[index]) {
+      //for WAVE 1 - immediate
+      toMint = true;
     } else {
-      //for WAVE 1
-      index = 3;
+      if (block.timestamp >= 1577836800) {
+        //for WAVE 2 - after 01/01/2020 @ 12:00am (UTC)
+        index = 1;
+        if (!tokensReleased[index]) {
+          toMint = true;
+        } else {
+          if (block.timestamp >= 1609459200) {
+            //for WAVE 3 - after 01/01/2021 @ 12:00am (UTC)
+            index = 2;
+            if (!tokensReleased[index]) {
+              toMint = true;
+            } else {
+              if (block.timestamp >= 1640995200) {
+                //for WAVE 4 - after 01/01/2022 @ 12:00am (UTC)
+                index = 3;
+                amount = 150000 * 10**decimals;
+                require(!tokensReleased[index]);
+                toMint = true;
+              }
+            }
+          }
+        }
+      }
     }
-    require(!tokensReleased[index]);
-    mint(walletREIDAO, amount);
-    tokensReleased[index] = true;
+    if (toMint) {
+      mint(wallet, amount);
+      tokensReleased[index] = true;
+      WaveReleased(index, amount);
+    }
   }
 }
