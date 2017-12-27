@@ -16,13 +16,13 @@ contract Owners {
   }
 
   function addOwner(address _address) public ownerOnly {
-    OwnerAdded(_address);
     owners[_address] = true;
+    OwnerAdded(_address);
   }
 
   function removeOwner(address _address) public ownerOnly {
-    OwnerRemoved(_address);
     owners[_address] = false;
+    OwnerRemoved(_address);
   }
 
   modifier ownerOnly {
