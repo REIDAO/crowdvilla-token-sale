@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "./ownership/Owners.sol";
 
-contract ReferrerAcct is Owners {
+contract ReferrerAcct is Owners(false) {
   bytes32 public code;
   address public referrerWallet;
   address public crowdvillaWallet;

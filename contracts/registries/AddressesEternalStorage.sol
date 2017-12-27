@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "../ownership/Owners.sol";
 
-contract AddressesEternalStorage is Owners {
+contract AddressesEternalStorage is Owners(true) {
 
   event EntryAdded(bytes32 key, address value);
   event EntryDeleted(bytes32 key);

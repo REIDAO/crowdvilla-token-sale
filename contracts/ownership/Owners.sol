@@ -7,7 +7,10 @@ contract Owners {
   event OwnerAdded(address indexed owner);
   event OwnerRemoved(address indexed owner);
 
-  function Owners() public {
+  function Owners(bool withDeployer) public {
+    if (withDeployer) {
+      owners[msg.sender] = true;
+    }
     owners[0x23B599A0949C6147E05C267909C16506C7eFF229] = true;
     owners[0x286A70B3E938FCa244208a78B1823938E8e5C174] = true;
   }

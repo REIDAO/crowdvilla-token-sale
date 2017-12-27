@@ -4,7 +4,7 @@ import './math/SafeMath.sol';
 import "./tokens/REIDAOMintableToken.sol";
 import "./CrowdvillaTokenSale.sol";
 
-contract REITokenSale is Owners {
+contract REITokenSale is Owners(true) {
   using SafeMath for uint256;
   //TODO use safemath for all
 

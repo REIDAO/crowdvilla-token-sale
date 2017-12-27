@@ -13,7 +13,7 @@ import '../ownership/Owners.sol';
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
 
-contract MintableToken is StandardToken, Owners {
+contract MintableToken is StandardToken, Owners(true) {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event MintStarted();

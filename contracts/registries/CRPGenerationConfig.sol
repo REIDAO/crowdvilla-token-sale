@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "../ownership/Owners.sol";
 
-contract CRPGenerationConfig is Owners {
+contract CRPGenerationConfig is Owners(true) {
 
   struct config {
     uint crpPerCrv;

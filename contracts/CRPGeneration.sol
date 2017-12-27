@@ -7,7 +7,7 @@ import "./registries/AddressesEternalStorage.sol";
 import "./registries/CRPAllocationConfig.sol";
 import "./registries/CRPGenerationConfig.sol";
 
-contract CRPGeneration is Owners {
+contract CRPGeneration is Owners(true) {
   using SafeMath for uint256;
 
   enum State { Active, Inactive }
