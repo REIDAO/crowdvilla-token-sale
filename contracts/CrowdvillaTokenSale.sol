@@ -22,10 +22,10 @@ contract CrowdvillaTokenSale is Owners {
   address public deployer;
   address public opsAdmin;
   address public crowdvillaWallet;
+  address public reidaoWallet;
   address public crvTokenAddr;
   address public crpTokenAddr;
   address public reiTokenAddr;
-  address walletREIDAO = 0x19BBe5157ffdf6Efa4C84810e7d2AE25832fF45D;
   mapping (address => Whitelist) public whitelist;
   mapping (bytes32 => address) public referralMultisig;
   mapping (uint => mapping (uint => uint)) public contributionsPerStretchGoal; //earlyRegistrant => stretch-goals => value
@@ -58,7 +58,8 @@ contract CrowdvillaTokenSale is Owners {
       uint _stretchGoal2,
       uint _stretchGoal3,
       address _opsAdmin,
-      address _wallet,
+      address _crowdvillaWallet,
+      address _reidaoWallet,
       address _crvTokenAddr,
       address _crpTokenAddr,
       address _reiTokenAddr) public {
@@ -66,7 +67,8 @@ contract CrowdvillaTokenSale is Owners {
     state = State.TokenSale;
 
     opsAdmin = address(_opsAdmin);
-    crowdvillaWallet = address(_wallet);
+    crowdvillaWallet = address(_crowdvillaWallet);
+    reidaoWallet = address(_reidaoWallet);
     crvTokenAddr = address(_crvTokenAddr);
     crpTokenAddr = address(_crpTokenAddr);
     reiTokenAddr = address(_reiTokenAddr);
@@ -202,11 +204,11 @@ contract CrowdvillaTokenSale is Owners {
 
   // ownerOnly - START ---------------------------------------------------------
   function collectREIDAODistribution() public ownerOnly {
-    require(!tokensCollected[walletREIDAO]);
+    require(!tokensCollected[reidaoWallet]);
     uint tokenAmount = getREIDAODistributionTokenAmount();
-    require(crvToken.mint(walletREIDAO, tokenAmount));
-    require(crpToken.mint(walletREIDAO, tokenAmount));
-    tokensCollected[walletREIDAO] = true;
+    require(crvToken.mint(reidaoWallet, tokenAmount));
+    require(crpToken.mint(reidaoWallet, tokenAmount));
+    tokensCollected[reidaoWallet] = true;
   }
 
   function updateSaleEndBlock(uint _saleEndBlock) public ownerOnly {
