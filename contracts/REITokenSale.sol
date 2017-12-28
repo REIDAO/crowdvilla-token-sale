@@ -6,7 +6,6 @@ import "./CrowdvillaTokenSale.sol";
 
 contract REITokenSale is Owners(true) {
   using SafeMath for uint256;
-  //TODO use safemath for all
 
   enum State { Stage1, Stage2, Stage3, Pause}
   State public state;
@@ -25,6 +24,7 @@ contract REITokenSale is Owners(true) {
   uint public reiTokenAllocatedToCrowdvilla;
   uint public reiTokenAllocatedToReidaoAssc;
   uint public reiTokenAllocatedToBounty;
+  mapping (address => uint) public sales;
 
   event Sale(uint indexed stage, address indexed contributor, uint amount, uint tokenAmount, uint refunded);
 
@@ -46,10 +46,17 @@ contract REITokenSale is Owners(true) {
     reidaoWallet = _reidaoWallet;
     stageMinTokens = [_stage1MinTokens, _stage2MinTokens, _stage3MinTokens];
     stageTokenPrice = [_stage1TokenPrice, _stage2TokenPrice, _stage3TokenPrice];
-    reiTokenMaxAmount = 5000000 * 10**reiToken.decimals();
-    reiTokenAllocatedToCrowdvilla = crowdvillaTokenSale.totalFund() * 5 * 10**reiToken.decimals() / 1 ether;
-    reiTokenAllocatedToReidaoAssc = 750000 * 10**reiToken.decimals();
-    reiTokenAllocatedToBounty = 200000 * 10**reiToken.decimals();
+
+    uint reiTokenMaxUnit = 5000000;
+    reiTokenMaxAmount = reiTokenMaxUnit.mul(10**reiToken.decimals());
+
+    reiTokenAllocatedToCrowdvilla = crowdvillaTokenSale.totalFund().mul(5).mul(10**reiToken.decimals()).div(1 ether);
+
+    uint reiTokenReidaoUnit = 750000;
+    reiTokenAllocatedToReidaoAssc = reiTokenReidaoUnit.mul(10**reiToken.decimals());
+
+    uint reiTokenBountyUnit = 200000;
+    reiTokenAllocatedToBounty = reiTokenBountyUnit.mul(10**reiToken.decimals());
   }
 
   // public - START ------------------------------------------------------------
@@ -57,22 +64,23 @@ contract REITokenSale is Owners(true) {
     require(state != State.Pause);
     uint index = uint8(state);
     require(msg.value >= stageTokenPrice[index]);
-    uint reiToMint = msg.value * 10**reiToken.decimals() / stageTokenPrice[index];
+    uint reiToMint = msg.value.mul(10**reiToken.decimals()).div(stageTokenPrice[index]);
     uint refundAmount;
     if (reiToMint <= stageAvailableTokens) {
-      stageAvailableTokens = stageAvailableTokens - reiToMint;
+      stageAvailableTokens = stageAvailableTokens.sub(reiToMint);
       reidaoWallet.transfer(msg.value);
       reiToken.mint(msg.sender, reiToMint);
     } else {
       reiToMint = stageAvailableTokens;
       reiToken.mint(msg.sender, reiToMint);
-      uint acceptedAmount = (reiToMint * stageTokenPrice[index] /  10**reiToken.decimals());
-      refundAmount = msg.value - acceptedAmount;
+      uint acceptedAmount = reiToMint.mul(stageTokenPrice[index]).div(10**reiToken.decimals());
+      refundAmount = msg.value.sub(acceptedAmount);
       reidaoWallet.transfer(acceptedAmount);
       msg.sender.transfer(refundAmount);
       stageAvailableTokens = 0;
     }
-    Sale(index+1, msg.sender, msg.value, reiToMint, refundAmount);
+    Sale(index.add(1), msg.sender, msg.value, reiToMint, refundAmount);
+    sales[msg.sender] = sales[msg.sender].add(msg.value.sub(refundAmount));
     if (stageAvailableTokens == 0) {
       state = State.Pause;
     }
@@ -89,13 +97,13 @@ contract REITokenSale is Owners(true) {
     require(_stage>=1 && _stage<=3);
     if (_stage==1) {
       state = State.Stage1;
-      stageAvailableTokens = reiTokenMaxAmount - reiTokenAllocatedToCrowdvilla - reiTokenAllocatedToReidaoAssc - reiTokenAllocatedToBounty - stageMinTokens[1] - stageMinTokens[2];
+      stageAvailableTokens = reiTokenMaxAmount.sub(reiTokenAllocatedToCrowdvilla).sub(reiTokenAllocatedToReidaoAssc).sub(reiTokenAllocatedToBounty).sub(stageMinTokens[1]).sub(stageMinTokens[2]);
     } else if (_stage==2) {
       state = State.Stage2;
-      stageAvailableTokens = stageAvailableTokens + stageMinTokens[1];
+      stageAvailableTokens = stageAvailableTokens.add(stageMinTokens[1]);
     } else if (_stage==3) {
       state = State.Stage3;
-      stageAvailableTokens = stageAvailableTokens + stageMinTokens[2];
+      stageAvailableTokens = stageAvailableTokens.add(stageMinTokens[2]);
     }
   }
   // ownerOnly - END -----------------------------------------------------------
