@@ -64,7 +64,7 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("Account #1 - Verifies CRP Token", function() {
+  it("Account #1 - Verifies CRP Token balance before generation", function() {
     return CRPTokenInstance.balanceOf(accounts[1])
     .then(function(result) {
       assert.equal(result.valueOf(), 0 * Math.pow(10,8));
@@ -84,10 +84,25 @@ contract('All', function(accounts) {
     ;
   });
 
+  it("Account #1 - Verifies CRV not transferable tokens after generation", function() {
+    return CRVTokenInstance.transferableTokens(accounts[1])
+    .then(function(result) {
+      assert.equal(result.valueOf(), 0 * Math.pow(10,8));
+    })
+    ;
+  });
+
   it("Account #1 - Verifies CRP Token balance after generation - 3000 CRP", function() {
     return CRPTokenInstance.balanceOf(accounts[1])
     .then(function(result) {
       assert.equal(result.valueOf(), 3000 * Math.pow(10,8));
+    })
+    ;
+  });
+  it("Account #1 - Verifies CRP tokens 50% transferable after generation - 1500 CRP", function() {
+    return CRPTokenInstance.transferableTokens(accounts[1])
+    .then(function(result) {
+      assert.equal(result.valueOf(), 1500 * Math.pow(10,8));
     })
     ;
   });
