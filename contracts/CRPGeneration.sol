@@ -14,12 +14,14 @@ contract CRPGeneration is Owners(true) {
   State public state;
   REIDAOMintableBurnableLockableToken crvToken;
   REIDAOMintableBurnableLockableToken crpToken;
+  bytes32 public defaultPlan;
 
   AddressesEternalStorage eternalStorage;
   CRPGenerationConfig crpGenerationConfig;
   CRPAllocationConfig crpAllocationConfig;
 
   function CRPGeneration(AddressesEternalStorage _eternalStorage) public {
+    defaultPlan = "default";
     state = State.Active;
     eternalStorage = _eternalStorage;
     crvToken = REIDAOMintableBurnableLockableToken(eternalStorage.getEntry("CRVToken"));
@@ -28,8 +30,6 @@ contract CRPGeneration is Owners(true) {
 
   //to be call to generate all available tokens
   function () public payable {
-    require(state == State.Active);
-    generateCRP("default", crvToken.balanceOf(msg.sender));
   }
 
   function generateCRP(bytes32 _plan, uint crvToLock) public payable {
@@ -66,14 +66,13 @@ contract CRPGeneration is Owners(true) {
     crpToken.mint(eternalStorage.getEntry("CRPWalletReidao"), crpForReidao);
   }
 
+  function changeDefaultPlan(bytes32 _defaultPlan) public ownerOnly {
+    defaultPlan = _defaultPlan;
+  }
   function activateState() public ownerOnly {
     state = State.Active;
   }
   function inactivateState() public ownerOnly {
     state = State.Inactive;
   }
-  function readCRPGenerationConfig(bytes32 _plan) internal view returns (uint,uint,uint,uint,uint,uint,bool) {
-    return crpGenerationConfig.configs(_plan);
-  }
-
 }
