@@ -10,14 +10,25 @@ contract REIToken is REIDAOMintableToken {
   mapping (uint => bool) tokensReleased;
   event WaveReleased(uint wave, uint amount);
 
+  /**
+   * @dev initializes contract
+   * @param _wallet address the address of REIDAO's wallet
+   */
   function REIToken(address _wallet) public {
     wallet = _wallet;
   }
 
+  /**
+   * @dev changes REIDAO wallet, can be called by owners.
+   */
   function changeWallet(address _wallet) public ownerOnly {
     wallet = _wallet;
   }
 
+  /**
+   * @dev disburses REI token allocated to REIDAO. this prevents multiple disbursements
+   *   of the same period.
+   */
   function disburseToREIDAO() public ownerOnly {
     uint index;
     uint amount = 200000 * 10**decimals;

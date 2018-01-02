@@ -53,6 +53,18 @@ contract CrowdvillaTokenSale is Owners(true) {
     bytes32 referralCode;
   }
 
+  /**
+   * @dev initializes contract
+   * @param _stretchGoal1 uint the stretch goal 1 amount in ETH
+   * @param _stretchGoal2 uint the stretch goal 2 amount in ETH
+   * @param _stretchGoal3 uint the stretch goal 3 amount in ETH
+   * @param _opsAdmin address the address of operation admin
+   * @param _crowdvillaWallet address the address of Crowdvilla's wallet
+   * @param _reidaoWallet address the address of REIDAO's wallet
+   * @param _crvTokenAddr address the address of CRVToken contract
+   * @param _crpTokenAddr address the address of CRPToken contract
+   * @param _reiTokenAddr address the address of REIToken contract
+   */
   function CrowdvillaTokenSale(
       uint _stretchGoal1,
       uint _stretchGoal2,
@@ -86,6 +98,10 @@ contract CrowdvillaTokenSale is Owners(true) {
 
 
   // public - START ------------------------------------------------------------
+  /**
+   * @dev accepts ether, records contributions, and splits payment if referral code exists.
+   *   contributor must be whitelisted, and sends the min ETH required.
+   */
   function () public payable {
     if (msg.value>0) {
       // for accepting fund
@@ -153,6 +169,11 @@ contract CrowdvillaTokenSale is Owners(true) {
     }
   }
 
+  /**
+   * @dev calculates the amount of CRV tokens allocated to `_contributor`, with
+   *   stretch goal calculation.
+   * @param _contributor address the address of contributor
+   */
   function getPromisedCRVTokenAmount(address _contributor) public constant returns (uint) {
     uint val;
 
@@ -166,6 +187,10 @@ contract CrowdvillaTokenSale is Owners(true) {
     return val;
   }
 
+  /**
+   * @dev calculates the amount of tokens allocated to `_contributor. 5 REI per ETH.
+   * @param _contributor address the address of contributor
+   */
   function getPromisedREITokenAmount(address _contributor) public constant returns (uint) {
     uint val;
     uint totalEthContributions;
@@ -177,6 +202,9 @@ contract CrowdvillaTokenSale is Owners(true) {
     return val;
   }
 
+  /**
+   * @dev calculates the amount of tokens allocated to REIDAO
+   */
   function getREIDAODistributionTokenAmount() public constant returns (uint) {
     //contributionsPerStretchGoal index 0 is for non-earlyRegistrant
     //contributionsPerStretchGoal index 1 is for earlyRegistrant
@@ -203,6 +231,9 @@ contract CrowdvillaTokenSale is Owners(true) {
 
 
   // ownerOnly - START ---------------------------------------------------------
+  /**
+   * @dev collects tokens distribution allocated to REIDAO
+   */
   function collectREIDAODistribution() public ownerOnly {
     require(!tokensCollected[reidaoWallet]);
     uint tokenAmount = getREIDAODistributionTokenAmount();
@@ -211,14 +242,24 @@ contract CrowdvillaTokenSale is Owners(true) {
     tokensCollected[reidaoWallet] = true;
   }
 
+  /**
+   * @dev updates sale end block
+   * @param _saleEndBlock uint block number denotes end of sale
+   */
   function updateSaleEndBlock(uint _saleEndBlock) public ownerOnly {
     saleEndBlock = _saleEndBlock;
   }
 
+  /**
+   * @dev ends token sale
+   */
   function endTokenSale() public ownerOnly {
     setEndState();
   }
 
+  /**
+   * @dev sets state as Collection
+   */
   function startCollection() public ownerOnly {
     state = State.Collection;
   }
@@ -293,19 +334,28 @@ contract CrowdvillaTokenSale is Owners(true) {
 
 
   // internal - START ----------------------------------------------------------
+  /**
+   * @dev sets state as End
+   */
   function setEndState() internal {
     state = State.End;
   }
 
   /**
    * @dev Allows authorized signatories to remove `_contributor` from the whitelist.
-   * @param _contributor address The address of contributor.
+   * @param _contributor address address of contributor.
    */
   function removeFromWhitelist(address _contributor) internal {
     whitelist[_contributor].whitelisted = false;
     whitelist[_contributor].isEarlyRegistrant = false;
   }
 
+  /**
+   * @dev logs contribution event
+   * @param _contributor address address of contributor
+   * @param _amount uint contribution amount
+   * @param _referralCode bytes32 referral code from the contribution. Empty string if none.
+   */
   function logContributeEvent(address _contributor, uint _amount, bytes32 _referralCode) internal {
     Contribute(block.number, block.timestamp, _contributor, this, _amount, _referralCode);
   }
@@ -314,7 +364,7 @@ contract CrowdvillaTokenSale is Owners(true) {
 
   // modifier - START ----------------------------------------------------------
   /**
-   * @dev Modifier that throws if sender is not opsAdmin.
+   * @dev throws if sender is not opsAdmin.
    */
   modifier opsAdminOnly {
     require(msg.sender == opsAdmin);

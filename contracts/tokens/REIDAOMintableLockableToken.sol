@@ -81,6 +81,8 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
 
   /**
    * @dev Modifier that throws if `_value` amount of tokens can't be transferred.
+   * @param _sender address the address of the sender
+   * @param _value uint the amount of tokens intended to be transferred
    */
   modifier canTransfer(address _sender, uint256 _value) {
     uint256 transferableTokensAmt = transferableTokens(_sender);
