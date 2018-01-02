@@ -9,6 +9,7 @@ contract REITokenSale is Owners(true) {
 
   enum State { Stage1, Stage2, Stage3, Pause}
   State public state;
+  State public pausedState;
 
   address public deployer;
   address public reiTokenAddr;
@@ -90,9 +91,14 @@ contract REITokenSale is Owners(true) {
 
   // ownerOnly - START ---------------------------------------------------------
   function pauseTokenSale() public ownerOnly {
+    pausedState = state;
     state = State.Pause;
   }
 
+  function resumeTokenSale() public ownerOnly {
+    require(state == State.Pause);
+    state = pausedState;
+  }
   function startTokenSale(uint _stage) public ownerOnly {
     require(_stage>=1 && _stage<=3);
     if (_stage==1) {
