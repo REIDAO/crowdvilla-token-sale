@@ -176,7 +176,7 @@ contract CrowdvillaTokenSale is Owners(true) {
       earlyRegistrantBonus = 1;
 
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val += (contributions[_contributor][i] * crvPerEth * (100 + ((currentStretchGoal-i + earlyRegistrantBonus) * 10))/100) / 1 ether;
+      val = val.add((contributions[_contributor][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).mul(earlyRegistrantBonus)).mul(10)).add(100)).div(100)).div(1 ether));
     }
     return val;
   }
@@ -204,10 +204,10 @@ contract CrowdvillaTokenSale is Owners(true) {
     //contributionsPerStretchGoal index 1 is for earlyRegistrant
     uint val;
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val += (contributionsPerStretchGoal[0][i] * crvPerEth * (100 + ((currentStretchGoal-i) * 10))/100) / 1 ether;
+      val = val.add((contributionsPerStretchGoal[0][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i)).mul(10)).add(100)).div(100)).div(1 ether));
     }
     for (i=0; i<=currentStretchGoal; i++) {
-      val += (contributionsPerStretchGoal[1][i] * crvPerEth * (100 + ((currentStretchGoal-i + 1) * 10))/100) / 1 ether;
+      val = val.add((contributionsPerStretchGoal[1][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).add(1)).mul(10)).add(100)).div(100)).div(1 ether));
     }
     uint total = (val.mul(100)).div(100 - mgmtFeePercentage);
     val = total.sub(val);
