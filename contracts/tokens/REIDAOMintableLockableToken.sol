@@ -12,6 +12,25 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
   mapping (address => TokenLock[]) public locks;
 
   /**
+  * @dev transfer token for a specified address
+  * @param _to The address to transfer to.
+  * @param _value The amount to be transferred.
+  */
+  function transfer(address _to, uint _value) public canTransfer(msg.sender, _value) returns (bool) {
+    return super.transfer(_to, _value);
+  }
+
+  /**
+   * @dev Transfer tokens from one address to another
+   * @param _from address The address which you want to send tokens from
+   * @param _to address The address which you want to transfer to
+   * @param _value uint256 the amount of tokens to be transferred
+   */
+  function transferFrom(address _from, address _to, uint _value) public canTransfer(msg.sender, _value) returns (bool) {
+    return super.transferFrom(_from, _to, _value);
+  }
+
+  /**
    * @dev Allows authorized callers to lock `_value` tokens belong to `_to` until timestamp `_lockUntil`.
    * This function can be called independently of transferAndLockTokens(), hence the double checking of timestamp.
    * @param _to address The address to be locked.
