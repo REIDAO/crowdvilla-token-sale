@@ -93,6 +93,9 @@ contract CrowdvillaTokenSale is Owners(true) {
     reiPerEth = 5 * (10**reiToken.decimals());
     mgmtFeePercentage = 20;
     saleEndBlock = 5280000; //appox end of Mar 2018
+    assert(0 < _stretchGoal1);
+    assert(_stretchGoal1 < _stretchGoal2);
+    assert(_stretchGoal2 < _stretchGoal3);
     stretchGoals = [_stretchGoal1 * 1 ether, _stretchGoal2 * 1 ether, _stretchGoal3 * 1 ether];
   }
 
