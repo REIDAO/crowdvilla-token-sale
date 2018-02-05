@@ -4,16 +4,6 @@ import "../ownership/Owners.sol";
 
 contract CRPAllocationConfig is Owners(true) {
 
-  struct config {
-    uint crpPerCrv;
-    uint crvLockPeriod;
-    uint initPct;
-    uint subseqPct;
-    uint subseqFreq;
-    uint subseqFreqIntervalDays;
-    bool isActive;
-  }
-
   mapping(bytes32 => uint) public configs;
 
   /**
