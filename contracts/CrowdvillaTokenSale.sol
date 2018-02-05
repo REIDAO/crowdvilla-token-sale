@@ -130,7 +130,7 @@ contract CrowdvillaTokenSale is Owners(true) {
       logContributeEvent(msg.sender, msg.value, referralCode);
 
       if (referralCode == bytes32(0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563)) {
-        //no referral code
+        //no referral code, value is derived from keccak256() function of zero or empty string
         crowdvillaWallet.transfer(msg.value);
       } else {
         //referral code exist, sending 99% to our wallet. 1% to multisig with arbiter
