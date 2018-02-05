@@ -61,11 +61,7 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    */
   function transferableTokens(address _holder) public constant returns (uint256) {
     uint256 lockedTokens = getLockedTokens(_holder);
-    if (lockedTokens==0) {
-      return balanceOf(_holder);
-    } else {
-      return balanceOf(_holder).sub(lockedTokens);
-    }
+    return balanceOf(_holder).sub(lockedTokens);
   }
 
   /**
@@ -74,9 +70,6 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    */
   function getLockedTokens(address _holder) public constant returns (uint256) {
     uint256 numLocks = getTokenLocksCount(_holder);
-
-    // shortcut for holder without locks
-    if (numLocks == 0) return 0;
 
     // Iterate through all the locks the holder has
     uint256 lockedTokens = 0;
