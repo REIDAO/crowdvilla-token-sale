@@ -17,6 +17,7 @@ contract REITokenSale is Owners(true) {
 
   REIDAOMintableToken reiToken;
   CrowdvillaTokenSale crowdvillaTokenSale;
+  mapping (uint => bool) public stageStarted;
   uint[] public stageMinTokens;
   uint[] public stageTokenPrice;
 
@@ -124,21 +125,21 @@ contract REITokenSale is Owners(true) {
   }
 
   /**
-   * @dev starts token sale with specified stage. can only by called by
-   *   owners with parameter [1..3]
-   * @param _stage uint the stage of token sale [1..3]
+   * @dev starts token sale in incremental stage. can only by called by owners
    */
-  function startTokenSale(uint _stage) public ownerOnly {
-    require(_stage>=1 && _stage<=3);
-    if (_stage==1) {
+  function startTokenSale() public ownerOnly {
+    if (!stageStarted[1]) {
       state = State.Stage1;
       stageAvailableTokens = reiTokenMaxAmount.sub(reiTokenAllocatedToCrowdvilla).sub(reiTokenAllocatedToReidaoAssc).sub(reiTokenAllocatedToBounty).sub(stageMinTokens[1]).sub(stageMinTokens[2]);
-    } else if (_stage==2) {
+      stageStarted[1] = true;
+    } else if (!stageStarted[2]) {
       state = State.Stage2;
       stageAvailableTokens = stageAvailableTokens.add(stageMinTokens[1]);
-    } else if (_stage==3) {
+      stageStarted[2] = true;
+    } else if (!stageStarted[3]) {
       state = State.Stage3;
       stageAvailableTokens = stageAvailableTokens.add(stageMinTokens[2]);
+      stageStarted[3] = true;
     }
   }
   // ownerOnly - END -----------------------------------------------------------
