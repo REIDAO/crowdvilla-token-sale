@@ -28,6 +28,7 @@ contract Owners {
    * @param _address address the address to be added
    */
   function addOwner(address _address) public ownerOnly {
+    require(_address != address(0));
     owners[_address] = true;
     ownersCount++;
     OwnerAdded(_address);
