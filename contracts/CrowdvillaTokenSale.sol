@@ -108,53 +108,49 @@ contract CrowdvillaTokenSale is Owners(true) {
       require(isInWhitelist(msg.sender));
       require(msg.value >= minContribution);
       require(state == State.TokenSale);
+      require(block.number < saleEndBlock);
 
-      if (block.number >= saleEndBlock) {
-        setEndState();
-        msg.sender.transfer(msg.value);
+      totalFund = totalFund.add(msg.value);
+
+      uint earlyRegistrantIndex = 0;
+      if (whitelist[msg.sender].isEarlyRegistrant) {
+        earlyRegistrantIndex = 1;
+      }
+
+      contributions[msg.sender][currentStretchGoal] = contributions[msg.sender][currentStretchGoal].add(msg.value);
+
+      contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal] = contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal].add(msg.value);
+      contributionsPerAddress[msg.sender] = contributionsPerAddress[msg.sender].add(msg.value);
+      bytes32 referralCode = whitelist[msg.sender].referralCode;
+      referralContribution[referralCode] = referralContribution[referralCode].add(msg.value);
+      logContributeEvent(msg.sender, msg.value, referralCode);
+
+      if (referralCode == bytes32(0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563)) {
+        //no referral code
+        crowdvillaWallet.transfer(msg.value);
       } else {
-        totalFund = totalFund.add(msg.value);
+        //referral code exist, sending 99% to our wallet. 1% to multisig with arbiter
+        uint crowdvillaAmount = (msg.value.mul(99)).div(100);
+        crowdvillaWallet.transfer(crowdvillaAmount);
+        referralMultisig[referralCode].transfer(msg.value.sub(crowdvillaAmount));
+      }
 
-        uint earlyRegistrantIndex = 0;
-        if (whitelist[msg.sender].isEarlyRegistrant) {
-          earlyRegistrantIndex = 1;
+      // to increase the currentStrechGoal targetted if the current one has been reached.
+      //  also safe-guard if multiple stretch goals reached with a single contribution.
+      // to end the token sale if it has reached the last stretch goal.
+      for (uint currGoal = currentStretchGoal; currGoal < stretchGoals.length; currGoal++) {
+        if (totalFund >= stretchGoals[currGoal] && currentStretchGoal != stretchGoals.length) {
+          currentStretchGoal++;
         }
-
-        contributions[msg.sender][currentStretchGoal] = contributions[msg.sender][currentStretchGoal].add(msg.value);
-
-        contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal] = contributionsPerStretchGoal[earlyRegistrantIndex][currentStretchGoal].add(msg.value);
-        contributionsPerAddress[msg.sender] = contributionsPerAddress[msg.sender].add(msg.value);
-        bytes32 referralCode = whitelist[msg.sender].referralCode;
-        referralContribution[referralCode] = referralContribution[referralCode].add(msg.value);
-        logContributeEvent(msg.sender, msg.value, referralCode);
-
-        if (referralCode == bytes32(0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563)) {
-          //no referral code
-          crowdvillaWallet.transfer(msg.value);
-        } else {
-          //referral code exist, sending 99% to our wallet. 1% to multisig with arbiter
-          uint crowdvillaAmount = (msg.value.mul(99)).div(100);
-          crowdvillaWallet.transfer(crowdvillaAmount);
-          referralMultisig[referralCode].transfer(msg.value.sub(crowdvillaAmount));
+        if (currentStretchGoal == stretchGoals.length) {
+          setEndState();
         }
+      }
 
-        // to increase the currentStrechGoal targetted if the current one has been reached.
-        //  also safe-guard if multiple stretch goals reached with a single contribution.
-        // to end the token sale if it has reached the last stretch goal.
-        for (uint currGoal = currentStretchGoal; currGoal < stretchGoals.length; currGoal++) {
-          if (totalFund >= stretchGoals[currGoal] && currentStretchGoal != stretchGoals.length) {
-            currentStretchGoal++;
-          }
-          if (currentStretchGoal == stretchGoals.length) {
-            setEndState();
-          }
-        }
-
-        if (contributorIndex[msg.sender]==0) {
-          uniqueContributors++;
-          contributorIndex[msg.sender] = uniqueContributors;
-          reversedContributorIndex[uniqueContributors] = msg.sender;
-        }
+      if (contributorIndex[msg.sender]==0) {
+        uniqueContributors++;
+        contributorIndex[msg.sender] = uniqueContributors;
+        reversedContributorIndex[uniqueContributors] = msg.sender;
       }
     } else {
       // for tokens collection
