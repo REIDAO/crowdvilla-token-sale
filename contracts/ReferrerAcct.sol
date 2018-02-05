@@ -15,7 +15,6 @@ contract ReferrerAcct is Owners(false) {
    * @param       _code bytes32 the referral code
    * @param       _referrerWallet address the address of referrer wallet
    * @param       _crowdvillaWallet address the address of crowdvilla wallet
-   * @constructor
    */
   function ReferrerAcct(bytes32 _code, address _referrerWallet, address _crowdvillaWallet) public {
     code = _code;
