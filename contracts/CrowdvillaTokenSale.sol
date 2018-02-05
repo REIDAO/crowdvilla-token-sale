@@ -109,6 +109,7 @@ contract CrowdvillaTokenSale is Owners(true) {
       require(msg.value >= minContribution);
       require(state == State.TokenSale);
       require(block.number < saleEndBlock);
+      require(currentStretchGoal < stretchGoals.length);
 
       totalFund = totalFund.add(msg.value);
 
@@ -141,9 +142,6 @@ contract CrowdvillaTokenSale is Owners(true) {
       for (uint currGoal = currentStretchGoal; currGoal < stretchGoals.length; currGoal++) {
         if (totalFund >= stretchGoals[currGoal] && currentStretchGoal != stretchGoals.length) {
           currentStretchGoal++;
-        }
-        if (currentStretchGoal == stretchGoals.length) {
-          setEndState();
         }
       }
 
