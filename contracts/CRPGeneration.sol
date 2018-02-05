@@ -47,7 +47,7 @@ contract CRPGeneration is Owners(true) {
    * Only proceed is the state of the contact is active, and the generation plan is active.
    * @dev public method
    * @param _plan bytes32 the name of the plan to be used to generate CRP
-   * @param crvToken uint total number of CRV tokens activated (to be locked)
+   * @param crvToLock uint total number of CRV tokens activated (to be locked)
    */
   function generateCRP(bytes32 _plan, uint crvToLock) public payable {
     require(state == State.Active);
@@ -64,12 +64,13 @@ contract CRPGeneration is Owners(true) {
     uint crpToMint = crvToLock.mul(crpPerCrv);
     uint crpForTokenHolder = crpToMint.mul(crpAllocationConfig.getConfig("tokenHolder")).div(100);
 
-    //release 50% CRP allocated for token holder immediately
+    //release immediate CRP allocation for token holder
     crpToken.mint(msg.sender, crpForTokenHolder.mul(initPct).div(100));
 
     //release remaining CRP allocated for token holder in 5 batches.
+    uint crpForTokenHolderSubseq = crpForTokenHolder.mul(subseqPct).div(100);
     for (uint i=0; i<subseqFreq; i++) {
-      crpToken.mintAndLockTokens(msg.sender, crpForTokenHolder.mul(subseqPct).div(100), now + (subseqFreqIntervalDays * (i+1)));
+      crpToken.mintAndLockTokens(msg.sender, crpForTokenHolderSubseq, now + (subseqFreqIntervalDays * (i+1)));
     }
     mintTokensForOtherParties(crpToMint);
   }
