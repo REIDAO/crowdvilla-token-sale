@@ -179,7 +179,9 @@ contract CrowdvillaTokenSale is Owners(true) {
       earlyRegistrantBonus = 1;
 
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val = val.add((contributions[_contributor][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).mul(earlyRegistrantBonus)).mul(10)).add(100)).div(100)).div(1 ether));
+      if (contributions[_contributor][i]>0) {
+        val = val.add((contributions[_contributor][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).mul(earlyRegistrantBonus)).mul(10)).add(100)).div(100)).div(1 ether));
+      }
     }
     return val;
   }
@@ -192,7 +194,9 @@ contract CrowdvillaTokenSale is Owners(true) {
     uint val;
     uint totalEthContributions;
     for (uint i=0; i<=currentStretchGoal; i++) {
-      totalEthContributions = totalEthContributions.add(contributions[_contributor][i]);
+      if (contributions[_contributor][i]>0) {
+        totalEthContributions = totalEthContributions.add(contributions[_contributor][i]);
+      }
     }
     val = (totalEthContributions.mul(reiPerEth)).div(1 ether);
 
@@ -207,10 +211,14 @@ contract CrowdvillaTokenSale is Owners(true) {
     //contributionsPerStretchGoal index 1 is for earlyRegistrant
     uint val;
     for (uint i=0; i<=currentStretchGoal; i++) {
-      val = val.add((contributionsPerStretchGoal[0][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i)).mul(10)).add(100)).div(100)).div(1 ether));
+      if (contributionsPerStretchGoal[0][i]>0) {
+        val = val.add((contributionsPerStretchGoal[0][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i)).mul(10)).add(100)).div(100)).div(1 ether));
+      }
     }
     for (i=0; i<=currentStretchGoal; i++) {
-      val = val.add((contributionsPerStretchGoal[1][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).add(1)).mul(10)).add(100)).div(100)).div(1 ether));
+      if (contributionsPerStretchGoal[1][i]>0) {
+        val = val.add((contributionsPerStretchGoal[1][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).add(1)).mul(10)).add(100)).div(100)).div(1 ether));
+      }
     }
     uint total = (val.mul(100)).div(100 - mgmtFeePercentage);
     val = total.sub(val);
