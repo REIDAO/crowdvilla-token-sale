@@ -60,7 +60,7 @@ module.exports = function(deployer, network, accounts) {
     AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletCrowdvillaOps", "0x6aCAfca6D7BdAe682Bd868d3ee4E15608e03adE3");
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletReidao", "0x19BBe5157ffdf6Efa4C84810e7d2AE25832fF45D");
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletReidao", reidaoWallet);
   })
   .then(function() {
     return deployer.deploy(CRPGeneration, AddressesEternalStorage.address);
