@@ -210,6 +210,8 @@ contract CrowdvillaTokenSale is Owners(true) {
     //contributionsPerStretchGoal index 0 is for non-earlyRegistrant
     //contributionsPerStretchGoal index 1 is for earlyRegistrant
     uint val;
+    // calculates total CRVToken created with token sale contributions, from both
+    //  earlyRegistrants and non-earlyRegistrants
     for (uint i=0; i<=currentStretchGoal; i++) {
       if (contributionsPerStretchGoal[0][i]>0) {
         val = val.add((contributionsPerStretchGoal[0][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i)).mul(10)).add(100)).div(100)).div(1 ether));
@@ -220,6 +222,9 @@ contract CrowdvillaTokenSale is Owners(true) {
         val = val.add((contributionsPerStretchGoal[1][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).add(1)).mul(10)).add(100)).div(100)).div(1 ether));
       }
     }
+    // total CRVToken created with token sale contributions represents
+    //  (100 - mgmtFeePercentage) % of total CRV. Calculates total CRV based on
+    //  mgmtFeePercentage and returns REIDAO allocation.
     uint total = (val.mul(100)).div(100 - mgmtFeePercentage);
     val = total.sub(val);
     return val;
