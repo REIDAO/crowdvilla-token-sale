@@ -38,7 +38,7 @@ contract REITokenSale is Owners(true) {
    * @param _stage2MinTokens uint the min tokens amount in stage 2 (excl. decimals)
    * @param _stage3MinTokens uint the min tokens amount in stage 3 (excl. decimals)
    * @param _stage1TokenPrice uint the price per 1 REI in wei, in stage 1
-   * @param _stage2TokenPrice uint the price per 1 REI in wei, in stage 3
+   * @param _stage2TokenPrice uint the price per 1 REI in wei, in stage 2
    * @param _stage3TokenPrice uint the price per 1 REI in wei, in stage 3
    */
   function REITokenSale(
@@ -57,7 +57,7 @@ contract REITokenSale is Owners(true) {
     reiToken = REIDAOMintableToken(reiTokenAddr);
     crowdvillaTokenSale = CrowdvillaTokenSale(_crowdvillaTokenSale);
     reidaoWallet = _reidaoWallet;
-    stageMinTokens = [_stage1MinTokens, _stage2MinTokens, _stage3MinTokens];
+    stageMinTokens = [_stage1MinTokens.mul(10**reiToken.decimals()), _stage2MinTokens.mul(10**reiToken.decimals()), _stage3MinTokens.mul(10**reiToken.decimals())];
     stageTokenPrice = [_stage1TokenPrice, _stage2TokenPrice, _stage3TokenPrice];
 
     uint reiTokenMaxUnit = 5000000;
