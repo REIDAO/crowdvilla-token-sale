@@ -81,6 +81,7 @@ contract REITokenSale is Owners(true) {
    *   contributors, accepts ether. an event is logged.
    */
   function () public payable {
+    require(stageAvailableTokens > 0);
     require(state != State.Pause);
     uint index = uint8(state);
     require(msg.value >= stageTokenPrice[index]);
@@ -101,9 +102,6 @@ contract REITokenSale is Owners(true) {
     }
     Sale(index.add(1), msg.sender, msg.value, reiToMint, refundAmount);
     sales[msg.sender] = sales[msg.sender].add(msg.value.sub(refundAmount));
-    if (stageAvailableTokens == 0) {
-      state = State.Pause;
-    }
   }
   // public - END --------------------------------------------------------------
 
