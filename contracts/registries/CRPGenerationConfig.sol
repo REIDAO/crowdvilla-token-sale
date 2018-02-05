@@ -14,6 +14,8 @@ contract CRPGenerationConfig is Owners(true) {
     bool isActive;
   }
 
+  event ConfigAdded(bytes32 plan, uint crpPerCrv, uint crvLockPeriod, uint initPct, uint subseqPct, uint subseqFreq, uint subseqFreqIntervalDays);
+
   mapping(bytes32 => config) public configs;
 
   /**
@@ -29,7 +31,8 @@ contract CRPGenerationConfig is Owners(true) {
    * @param _crpPerCrv uint the amount of CRP generated per 1 CRV
    * @param _crvLockPeriod uint the locking period for CRV tokens
    * @param _initPct uint the percentage of CRP tokens to be released immediately
-   * @param _subseqFreq uint the percentage of CRP tokens to be released subsequently
+   * @param _subseqPct uint the percentage of CRP tokens to be released subsequently
+   * @param _subseqFreq uint frequency of subsequent release of CRP tokens
    * @param _subseqFreqIntervalDays uint the interval number of days `_subseqFreq` is applicable
    * @param _isActive bool indicates whether the plan is active
    */
@@ -42,6 +45,7 @@ contract CRPGenerationConfig is Owners(true) {
     uint _subseqFreq,
     uint _subseqFreqIntervalDays,
     bool _isActive) public ownerOnly {
+      require(_initPct + (_subseqPct * _subseqFreq) == 100);
       configs[_plan].crpPerCrv = _crpPerCrv;
       configs[_plan].crvLockPeriod = _crvLockPeriod;
       configs[_plan].initPct = _initPct;
@@ -49,6 +53,7 @@ contract CRPGenerationConfig is Owners(true) {
       configs[_plan].subseqFreq = _subseqFreq;
       configs[_plan].subseqFreqIntervalDays = _subseqFreqIntervalDays;
       configs[_plan].isActive = _isActive;
+      ConfigAdded(_plan, _crpPerCrv, _crvLockPeriod, _initPct, _subseqPct, _subseqFreq, _subseqFreqIntervalDays);
   }
 
   /**
