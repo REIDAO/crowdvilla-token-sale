@@ -180,7 +180,7 @@ contract CrowdvillaTokenSale is Owners(true) {
 
     for (uint i=0; i<=currentStretchGoal; i++) {
       if (contributions[_contributor][i]>0) {
-        val = val.add((contributions[_contributor][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).mul(earlyRegistrantBonus)).mul(10)).add(100)).div(100)).div(1 ether));
+        val = val.add((contributions[_contributor][i].mul(crvPerEth).mul(((currentStretchGoal.sub(i).add(earlyRegistrantBonus)).mul(10)).add(100)).div(100)).div(1 ether));
       }
     }
     return val;
