@@ -1,7 +1,7 @@
 /* TEST DATA - START */
 //accounts[0] = deployer, owner
 //accounts[1] = nonOwner
-//accounts[2..4] = token holders
+//accounts[2..5] = token holders
 
 var loggingEnabled = false;
 
@@ -12,7 +12,13 @@ var CRVTokenInstance; var CRPTokenInstance;
 contract('All', function(accounts) {
   var owner = accounts[0];
   var nonOwner = accounts[1];
-  var lockedTokensFutureTimeout = new Date().getTime() + 1000;
+  var nowTime = new Date().getTime()/1000 | 0;
+  var lockedTokensFutureTimeout = nowTime + 100;
+  var secondsAdvance = 5;
+  var lockedTokensSlowFutureTimeout = nowTime + secondsAdvance;
+  console.log("nowTime                       : " + nowTime);
+  console.log("lockedTokensFutureTimeout     : " + lockedTokensFutureTimeout);
+  console.log("lockedTokensSlowFutureTimeout : " + lockedTokensSlowFutureTimeout);
 
   it("CRVToken - Deployment successful", function() {
     return CRVToken.deployed()
@@ -243,6 +249,67 @@ contract('All', function(accounts) {
     .then(function(result) {
       assert.equal(result.valueOf(), 10 * Math.pow(10,8));
     });
+  })
+  it("Account #4 - Transfer lockable tokens should fail", function() {
+    return CRVTokenInstance.transfer(accounts[5], 2 * Math.pow(10,8), {from:accounts[4]})
+    .catch(function(error) {
+      assert(true, error.toString().indexOf("VM Exception")>-1);
+    })
+    ;
+  })
+  it("Account #5 - Mint tokens successful from Owner", function() {
+    return CRVTokenInstance.mintAndLockTokens(accounts[5], 10 * Math.pow(10,8), lockedTokensSlowFutureTimeout, {from:owner})
+    .then(function(result) {
+      return CRVTokenInstance.getLockedTokens(accounts[5])
+    })
+    .then(function(result) {
+      assert.equal(result.valueOf(), 10 * Math.pow(10,8));
+    })
+    ;
+  });
+  it("Account #5 - Balance check after minting", function() {
+    return CRVTokenInstance.balanceOf(accounts[5])
+    .then(function(result) {
+      assert.equal(result.valueOf(), 10 * Math.pow(10,8));
+    });
+  })
+  it("Account #5 - Transfer tokens should be OK", function() {
+    setTimeout(function() {
+      return CRVTokenInstance.transfer(accounts[7], 10 * Math.pow(10,8), {from:accounts[5]})
+      .then(function(result) {
+        return CRVTokenInstance.balanceOf(accounts[5])
+      })
+      .then(function(result) {
+        assert.equal(result.valueOf(), 0 * Math.pow(10,8));
+      })
+      ;
+    }, (secondsAdvance+1) * 1000);
+  })
+  it("Account #6 - Mint tokens successful from Owner", function() {
+    return CRVTokenInstance.mint(accounts[6], 10 * Math.pow(10,8), {from:owner})
+    .then(function(result) {
+      return CRVTokenInstance.getLockedTokens(accounts[6])
+    })
+    .then(function(result) {
+      assert.equal(result.valueOf(), 0 * Math.pow(10,8));
+    })
+    ;
+  });
+  it("Account #6 - Balance check after minting", function() {
+    return CRVTokenInstance.balanceOf(accounts[6])
+    .then(function(result) {
+      assert.equal(result.valueOf(), 10 * Math.pow(10,8));
+    });
+  })
+  it("Account #6 - Transfer tokens should be OK", function() {
+    return CRVTokenInstance.transfer(accounts[7], 2 * Math.pow(10,8), {from:accounts[6]})
+    .then(function(result) {
+      return CRVTokenInstance.balanceOf(accounts[6])
+    })
+    .then(function(result) {
+      assert.equal(result.valueOf(), 8 * Math.pow(10,8));
+    })
+    ;
   })
 });
 

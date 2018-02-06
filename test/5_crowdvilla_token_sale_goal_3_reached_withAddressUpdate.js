@@ -241,6 +241,7 @@ contract('All', function(accounts) {
     ;
   });
 
+  /* state no longer ended by caller when stretch goals reached
   it("CrowdvillaTokenSale - State should be Ended", function() {
     return CrowdvillaTokenSaleInstance.state.call()
     .then(function(result) {
@@ -248,6 +249,7 @@ contract('All', function(accounts) {
     })
     ;
   });
+  */
 
 
   it("CrowdvillaTokenSale - Account #4 | Update Address - Accounts #9", function() {
