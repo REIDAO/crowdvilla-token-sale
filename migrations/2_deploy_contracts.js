@@ -23,7 +23,7 @@ module.exports = function(deployer, network, accounts) {
   .then(function() {
     return deployer.deploy(
       CrowdvillaTokenSale,
-      100000, 250000, 500000,
+      50000, 125000, 250000,
       opsAdmin,
       crowdvillaWallet,
       reidaoWallet,
@@ -71,5 +71,5 @@ module.exports = function(deployer, network, accounts) {
 /*
 NOTE:
 - For Testing, use stretch-goals 4, 7, 10
-- For Live Deployment, use stretch-goals 100000, 250000, 500000
+- For Live Deployment, use stretch-goals 50000, 125000, 250000
  */
