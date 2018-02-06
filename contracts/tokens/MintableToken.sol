@@ -33,6 +33,10 @@ contract MintableToken is StandardToken, Owners(true) {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) ownerOnly canMint onlyPayloadSize(2 * 32) public returns (bool) {
+    return internalMint(_to, _amount);
+  }
+
+  function internalMint(address _to, uint256 _amount) internal returns (bool) {
     totalSupply = totalSupply.add(_amount);
     balances[_to] = balances[_to].add(_amount);
     Mint(_to, _amount);

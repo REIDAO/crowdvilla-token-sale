@@ -51,7 +51,7 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    */
   function mintAndLockTokens(address _to, uint256 _value, uint256 _lockUntil) public ownerOnly {
     require(_lockUntil > now);
-    mint(_to, _value);
+    internalMint(_to, _value);
     lockTokens(_to, _value, _lockUntil);
   }
 
