@@ -33,11 +33,19 @@ contract CRPGeneration is Owners(true) {
   }
 
   /**
-   * @notice generates CRP according to the deault plan.
-   * @dev public method
+   * @notice generates CRP according to the default plan, for all CRV owned
+   * @dev external method
    */
-  function () public payable {
+  function () external {
     generateCRP(defaultPlan, crvToken.balanceOf(msg.sender));
+  }
+
+  /**
+   * @notice generates CRP according to the default plan, for all CRV owned
+   * @dev external method
+   */
+  function generateCRPPlan(bytes32 _plan) external {
+    generateCRP(_plan, crvToken.balanceOf(msg.sender));
   }
 
   /**
