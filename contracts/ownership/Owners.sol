@@ -39,7 +39,9 @@ contract Owners {
    * @param _address address the address to be removed
    */
   function removeOwner(address _address) public ownerOnly notOwnerItself(_address) minOwners {
+    require(owners[_address] == true);
     owners[_address] = false;
+    ownersCount--;
     OwnerRemoved(_address);
   }
 
