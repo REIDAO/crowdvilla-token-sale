@@ -15,6 +15,7 @@ contract CRPGeneration is Owners(true) {
   REIDAOMintableBurnableLockableToken crvToken;
   REIDAOMintableBurnableLockableToken crpToken;
   bytes32 public defaultPlan;
+  event GeneratePoints(address indexed sender, bytes32 plan, uint crpCommitted, uint crpLockedUntil);
 
   AddressesEternalStorage eternalStorage;
   CRPGenerationConfig crpGenerationConfig;
@@ -81,6 +82,7 @@ contract CRPGeneration is Owners(true) {
       crpToken.mintAndLockTokens(msg.sender, crpForTokenHolderSubseq, now + (subseqFreqIntervalDays * (i+1)));
     }
     mintTokensForOtherParties(crpToMint);
+    GeneratePoints(msg.sender, _plan, crvToLock, now + crvLockPeriod);
   }
 
   /**
