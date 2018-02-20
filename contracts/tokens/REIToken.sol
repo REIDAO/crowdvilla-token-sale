@@ -48,7 +48,7 @@ contract REIToken is REIDAOMintableToken {
 
   function releaseWave(uint wave, uint amount) internal {
     assert(1 <= wave && wave <=4);
-    mint(wallet, amount);
+    internalMint(wallet, amount);
     tokensReleased[wave-1] = true;
     WaveReleased(wave, amount);
   }
