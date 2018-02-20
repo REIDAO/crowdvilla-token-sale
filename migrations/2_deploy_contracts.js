@@ -18,7 +18,7 @@ module.exports = function(deployer, network, accounts) {
     return deployer.deploy(CRPToken);
   })
   .then(function() {
-    return deployer.deploy(REIToken);
+    return deployer.deploy(REIToken, reidaoWallet);
   })
   .then(function() {
     return deployer.deploy(
