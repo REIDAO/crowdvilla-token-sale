@@ -14,6 +14,10 @@ var loggingEnabled = false;
 var CrowdvillaTokenSale            = artifacts.require("./CrowdvillaTokenSale.sol");
 var CrowdvillaTokenSaleInstance;
 
+var crvPerETH = 4000;
+var crvBonusRate = crvPerETH * 10/100; //10%
+var mgmtFee = 20;
+
 contract('All', function(accounts) {
   it("CrowdvillaTokenSale - Deployment successful", function() {
     return CrowdvillaTokenSale.deployed()
@@ -168,35 +172,35 @@ contract('All', function(accounts) {
 
   var CRVmintedForContributors = [];
 
-  it("CrowdvillaTokenSale - Account #2 | Promised CRV should be " + contributionInEther * (400 + (bonusMultiplier * 40)) + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #2 | Promised CRV should be " + contributionInEther * (crvPerETH + (bonusMultiplier * crvBonusRate)) + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[2])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * (400 + (bonusMultiplier * 40)) * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * (crvPerETH + (bonusMultiplier * crvBonusRate)) * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #3 | Promised CRV should be " + contributionInEther * (400 + ((bonusMultiplier-1) * 40)) + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #3 | Promised CRV should be " + contributionInEther * (crvPerETH + ((bonusMultiplier-1) * crvBonusRate)) + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[3])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * (400 + ((bonusMultiplier-1) * 40)) * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * (crvPerETH + ((bonusMultiplier-1) * crvBonusRate)) * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #4 | Promised CRV should be " + contributionInEther * 400 + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #4 | Promised CRV should be " + contributionInEther * crvPerETH + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[4])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * 400 * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * crvPerETH * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Summary | MgmtFeeTokenAmount should be 310 CRV", function() {
+  it("CrowdvillaTokenSale - Summary | MgmtFeeTokenAmount should be 3100 CRV", function() {
     return CrowdvillaTokenSaleInstance.getREIDAODistributionTokenAmount.call()
     .then(function(result) {
       var totalCRVMintedForContributors = CRVmintedForContributors.reduce(function(a, b) { return parseInt(a) + parseInt(b); }, 0);
-      assert.equal(result.valueOf(), totalCRVMintedForContributors * 20/80);
+      assert.equal(result.valueOf(), totalCRVMintedForContributors * mgmtFee/(100-mgmtFee));
     })
     ;
   });

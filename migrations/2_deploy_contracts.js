@@ -1,12 +1,12 @@
 var CrowdvillaTokenSale = artifacts.require("./CrowdvillaTokenSale.sol");
 var REIToken = artifacts.require("./tokens/REIToken.sol");
 var CRVToken = artifacts.require("./tokens/CRVToken.sol");
-var CRPToken = artifacts.require("./tokens/CRPToken.sol");
+var Point = artifacts.require("./tokens/Point.sol");
 
 var AddressesEternalStorage = artifacts.require("./registries/AddressesEternalStorage.sol");
-var CRPAllocationConfig = artifacts.require("./registries/CRPAllocationConfig.sol");
-var CRPGenerationConfig = artifacts.require("./registries/CRPGenerationConfig.sol");
-var CRPGeneration = artifacts.require("./CRPGeneration.sol");
+var PointAllocationConfig = artifacts.require("./registries/PointAllocationConfig.sol");
+var PointGenerationConfig = artifacts.require("./registries/PointGenerationConfig.sol");
+var PointGeneration = artifacts.require("./PointGeneration.sol");
 
 var reidaoWallet = "0x19BBe5157ffdf6Efa4C84810e7d2AE25832fF45D";
 var crowdvillaWallet = "0x0c99d61b2019d48319C0339F2cE30A2C6f3F4430";
@@ -15,7 +15,7 @@ var opsAdmin = "0x0E7a6B35D6f10eE4805Af1E244dF3bF7819e1320";
 module.exports = function(deployer, network, accounts) {
   deployer.deploy(CRVToken)
   .then(function() {
-    return deployer.deploy(CRPToken);
+    return deployer.deploy(Point);
   })
   .then(function() {
     return deployer.deploy(REIToken, reidaoWallet);
@@ -28,42 +28,42 @@ module.exports = function(deployer, network, accounts) {
       crowdvillaWallet,
       reidaoWallet,
       CRVToken.address,
-      CRPToken.address,
+      Point.address,
       REIToken.address
       );
   })
   .then(function() {
-    return deployer.deploy(CRPGenerationConfig);
+    return deployer.deploy(PointGenerationConfig);
   })
   .then(function() {
-    return deployer.deploy(CRPAllocationConfig);
+    return deployer.deploy(PointAllocationConfig);
   })
   .then(function() {
     return deployer.deploy(AddressesEternalStorage);
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPGenerationConfig", CRPGenerationConfig.address);
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("PointGenerationConfig", PointGenerationConfig.address);
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPAllocationConfig", CRPAllocationConfig.address);
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("PointAllocationConfig", PointAllocationConfig.address);
   })
   .then(function() {
     AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRVToken", CRVToken.address);
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPToken", CRPToken.address);
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("Point", Point.address);
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletCrowdvillaNpo", "0xae615F6d1c3F2e0Aa5279643853172163109332A");
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("PointWalletCrowdvillaNpo", "0xae615F6d1c3F2e0Aa5279643853172163109332A");
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletCrowdvillaOps", "0x6aCAfca6D7BdAe682Bd868d3ee4E15608e03adE3");
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("PointWalletCrowdvillaOps", "0x6aCAfca6D7BdAe682Bd868d3ee4E15608e03adE3");
   })
   .then(function() {
-    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("CRPWalletReidao", reidaoWallet);
+    AddressesEternalStorage.at(AddressesEternalStorage.address).addEntry("PointWalletReidao", reidaoWallet);
   })
   .then(function() {
-    return deployer.deploy(CRPGeneration, AddressesEternalStorage.address);
+    return deployer.deploy(PointGeneration, AddressesEternalStorage.address);
   })
   ;
 };

@@ -216,20 +216,6 @@
   },
   {
     constant: true,
-    inputs: [],
-    name: 'crpTokenAddr',
-    outputs: [
-      {
-        name: '',
-        type: 'address'
-      }
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    constant: true,
     inputs: [
       {
         name: '',
@@ -424,6 +410,20 @@
       {
         name: '',
         type: 'uint256'
+      }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'pointAddr',
+    outputs: [
+      {
+        name: '',
+        type: 'address'
       }
     ],
     payable: false,
@@ -733,7 +733,7 @@
         type: 'address'
       },
       {
-        name: '_crpTokenAddr',
+        name: '_pointAddr',
         type: 'address'
       },
       {
@@ -747,7 +747,7 @@
   },
   {
     payable: true,
-    stateMutability: 'payable',
+    stateMutability: payable,
     type: 'fallback'
   },
   {

@@ -2,16 +2,16 @@ pragma solidity ^0.4.18;
 
 import "../ownership/Owners.sol";
 
-contract CRPAllocationConfig is Owners(true) {
+contract PointAllocationConfig is Owners(true) {
 
   mapping(bytes32 => uint) public configs;
 
-  event CRPAllocationConfigSet(uint allocationTokenHolder, uint allocationCrowdvillaNpo, uint allocationCrowdvillaOps, uint allocationReidao);
+  event ConfigSet(uint allocationTokenHolder, uint allocationCrowdvillaNpo, uint allocationCrowdvillaOps, uint allocationReidao);
 
   /**
    * @dev initialized contract with default values
    */
-  function CRPAllocationConfig() public {
+  function PointAllocationConfig() public {
     addConfig(30, 50, 15, 5);
   }
 
@@ -28,7 +28,7 @@ contract CRPAllocationConfig is Owners(true) {
     configs["crowdvillaNpo"] = _allocCrowdvillaNpo;
     configs["crowdvillaOps"] = _allocCrowdvillaOps;
     configs["reidao"] = _allocReidao;
-    CRPAllocationConfigSet(_allocTokenHolder, _allocCrowdvillaNpo, _allocCrowdvillaOps, _allocReidao);
+    ConfigSet(_allocTokenHolder, _allocCrowdvillaNpo, _allocCrowdvillaOps, _allocReidao);
   }
 
   /**

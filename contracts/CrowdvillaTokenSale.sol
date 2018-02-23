@@ -24,7 +24,7 @@ contract CrowdvillaTokenSale is Owners(true) {
   address public crowdvillaWallet;
   address public reidaoWallet;
   address public crvTokenAddr;
-  address public crpTokenAddr;
+  address public pointAddr;
   address public reiTokenAddr;
   mapping (address => Whitelist) public whitelist;
   mapping (bytes32 => address) public referralMultisig;
@@ -44,7 +44,7 @@ contract CrowdvillaTokenSale is Owners(true) {
   State public state;
 
   REIDAOMintableBurnableLockableToken crvToken;
-  REIDAOMintableBurnableLockableToken crpToken;
+  REIDAOMintableBurnableLockableToken point;
   REIDAOMintableToken reiToken;
 
   struct Whitelist {
@@ -62,7 +62,7 @@ contract CrowdvillaTokenSale is Owners(true) {
    * @param _crowdvillaWallet address the address of Crowdvilla's wallet
    * @param _reidaoWallet address the address of REIDAO's wallet
    * @param _crvTokenAddr address the address of CRVToken contract
-   * @param _crpTokenAddr address the address of CRPToken contract
+   * @param _pointAddr address the address of Point contract
    * @param _reiTokenAddr address the address of REIToken contract
    */
   function CrowdvillaTokenSale(
@@ -73,7 +73,7 @@ contract CrowdvillaTokenSale is Owners(true) {
       address _crowdvillaWallet,
       address _reidaoWallet,
       address _crvTokenAddr,
-      address _crpTokenAddr,
+      address _pointAddr,
       address _reiTokenAddr) public {
     deployer = msg.sender;
     state = State.TokenSale;
@@ -82,14 +82,14 @@ contract CrowdvillaTokenSale is Owners(true) {
     crowdvillaWallet = address(_crowdvillaWallet);
     reidaoWallet = address(_reidaoWallet);
     crvTokenAddr = address(_crvTokenAddr);
-    crpTokenAddr = address(_crpTokenAddr);
+    pointAddr = address(_pointAddr);
     reiTokenAddr = address(_reiTokenAddr);
     crvToken = REIDAOMintableBurnableLockableToken(crvTokenAddr);
-    crpToken = REIDAOMintableBurnableLockableToken(crpTokenAddr);
+    point = REIDAOMintableBurnableLockableToken(pointAddr);
     reiToken = REIDAOMintableToken(reiTokenAddr);
 
     minContribution = 1 ether;
-    crvPerEth = 400 * (10**crvToken.decimals());
+    crvPerEth = 4000 * (10**crvToken.decimals());
     reiPerEth = 5 * (10**reiToken.decimals());
     mgmtFeePercentage = 20;
     saleEndBlock = 5280000; //appox end of Mar 2018
@@ -160,7 +160,7 @@ contract CrowdvillaTokenSale is Owners(true) {
       uint promisedCRVToken = getPromisedCRVTokenAmount(msg.sender);
       require(promisedCRVToken>0);
       require(crvToken.mint(msg.sender, promisedCRVToken));
-      require(crpToken.mint(msg.sender, promisedCRVToken));
+      require(point.mint(msg.sender, promisedCRVToken));
       require(reiToken.mint(msg.sender, getPromisedREITokenAmount(msg.sender)));
       tokensCollected[msg.sender] = true;
     }
@@ -248,7 +248,7 @@ contract CrowdvillaTokenSale is Owners(true) {
     require(!tokensCollected[reidaoWallet]);
     uint tokenAmount = getREIDAODistributionTokenAmount();
     require(crvToken.mint(reidaoWallet, tokenAmount));
-    require(crpToken.mint(reidaoWallet, tokenAmount));
+    require(point.mint(reidaoWallet, tokenAmount));
     tokensCollected[reidaoWallet] = true;
   }
 

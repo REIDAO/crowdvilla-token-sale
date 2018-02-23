@@ -13,10 +13,14 @@ var loggingEnabled = false;
 
 var CrowdvillaTokenSale   = artifacts.require("./CrowdvillaTokenSale.sol");
 var CRVToken              = artifacts.require("./tokens/CRVToken.sol");
-var CRPToken              = artifacts.require("./tokens/CRPToken.sol");
+var Point                 = artifacts.require("./tokens/Point.sol");
 var REIToken              = artifacts.require("./tokens/REIToken.sol")
 var CrowdvillaTokenSaleInstance;
-var CRVTokenInstance; var CRPTokenInstance; var REITokenInstance;
+var CRVTokenInstance; var PointInstance; var REITokenInstance;
+
+var crvPerETH = 4000;
+var crvBonusRate = crvPerETH * 10/100; //10%
+var mgmtFee = 20;
 
 contract('All', function(accounts) {
   it("CrowdvillaTokenSale - Deployment successful", function() {
@@ -35,10 +39,10 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CRPToken - Deployment successful", function() {
-    return CRPToken.deployed()
+  it("Point - Deployment successful", function() {
+    return Point.deployed()
     .then(function(result) {
-      CRPTokenInstance = result;
+      PointInstance = result;
       assert.isNotNull(result.address, "Address is not empty: " + result.address);
     })
     ;
@@ -196,35 +200,35 @@ contract('All', function(accounts) {
 
   var CRVmintedForContributors = [];
 
-  it("CrowdvillaTokenSale - Account #2 | Promised CRV should be " + contributionInEther * (400 + (bonusMultiplier * 40)) + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #2 | Promised CRV should be " + contributionInEther * (crvPerETH + (bonusMultiplier * crvBonusRate)) + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[2])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * (400 + (bonusMultiplier * 40)) * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * (crvPerETH + (bonusMultiplier * crvBonusRate)) * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #3 | Promised CRV should be " + contributionInEther * (400 + ((bonusMultiplier-1) * 40)) + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #3 | Promised CRV should be " + contributionInEther * (crvPerETH + ((bonusMultiplier-1) * crvBonusRate)) + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[3])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * (400 + ((bonusMultiplier-2) * 40)) * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * (crvPerETH + ((bonusMultiplier-2) * crvBonusRate)) * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #4 | Promised CRV should be " + contributionInEther * 400 + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #4 | Promised CRV should be " + contributionInEther * crvPerETH + " CRV", function() {
     return CrowdvillaTokenSaleInstance.getPromisedCRVTokenAmount(accounts[4])
     .then(function(result) {
       CRVmintedForContributors.push(result.valueOf());
-      assert.equal(result.valueOf(), contributionInEther * (400 + (Math.max((bonusMultiplier-3),0) * 40)) * Math.pow(10,8));
+      assert.equal(result.valueOf(), contributionInEther * (crvPerETH + (Math.max((bonusMultiplier-3),0) * crvBonusRate)) * Math.pow(10,8));
     })
     ;
   });
-  it("CrowdvillaTokenSale - Summary | MgmtFeeTokenAmount should be 1480 CRV", function() {
+  it("CrowdvillaTokenSale - Summary | MgmtFeeTokenAmount should be 14800 CRV", function() {
     return CrowdvillaTokenSaleInstance.getREIDAODistributionTokenAmount.call()
     .then(function(result) {
       var totalCRVMintedForContributors = CRVmintedForContributors.reduce(function(a, b) { return parseInt(a) + parseInt(b); }, 0);
-      assert.equal(result.valueOf(), totalCRVMintedForContributors * 20/80);
+      assert.equal(result.valueOf(), totalCRVMintedForContributors * mgmtFee/(100-mgmtFee));
     })
     ;
   });
@@ -247,8 +251,8 @@ contract('All', function(accounts) {
     return CRVTokenInstance.addOwner(CrowdvillaTokenSaleInstance.address, {from:accounts[0]})
     ;
   });
-  it("CRPToken - Add Owners for minting", function() {
-    return CRPTokenInstance.addOwner(CrowdvillaTokenSaleInstance.address, {from:accounts[0]})
+  it("Point - Add Owners for minting", function() {
+    return PointInstance.addOwner(CrowdvillaTokenSaleInstance.address, {from:accounts[0]})
     ;
   });
   it("REIToken - Add Owners for minting", function() {
@@ -262,8 +266,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CRPToken - TotalSupply | Pre Collection", function() {
-    return CRPTokenInstance.totalSupply.call().then(function(result) {
+  it("Point - TotalSupply | Pre Collection", function() {
+    return PointInstance.totalSupply.call().then(function(result) {
       assert.equal(result.valueOf(), 0);
     })
     ;
@@ -281,8 +285,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #2 | CRP Balance Pre Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[2]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #2 | Point Balance Pre Collection", function() {
+    return PointInstance.balanceOf(accounts[2]).then(function(result) {
       assert.equal(result.valueOf(), 0);
     })
     ;
@@ -297,8 +301,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #2 | CRP Balance Post Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[2]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #2 | Point Balance Post Collection", function() {
+    return PointInstance.balanceOf(accounts[2]).then(function(result) {
       assert.equal(result.valueOf(), CRVmintedForContributors[0]);
     })
     ;
@@ -310,8 +314,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #3 | CRP Balance Pre Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[3]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #3 | Point Balance Pre Collection", function() {
+    return PointInstance.balanceOf(accounts[3]).then(function(result) {
       assert.equal(result.valueOf(), 0);
     })
     ;
@@ -326,8 +330,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #3 | CRP Balance Post Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[3]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #3 | Point Balance Post Collection", function() {
+    return PointInstance.balanceOf(accounts[3]).then(function(result) {
       assert.equal(result.valueOf(), CRVmintedForContributors[1]);
     })
     ;
@@ -339,8 +343,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #4 | CRP Balance Pre Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[4]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #4 | Point Balance Pre Collection", function() {
+    return PointInstance.balanceOf(accounts[4]).then(function(result) {
       assert.equal(result.valueOf(), 0);
     })
     ;
@@ -355,8 +359,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CrowdvillaTokenSale - Account #4 | CRP Balance Post Collection", function() {
-    return CRPTokenInstance.balanceOf(accounts[4]).then(function(result) {
+  it("CrowdvillaTokenSale - Account #4 | Point Balance Post Collection", function() {
+    return PointInstance.balanceOf(accounts[4]).then(function(result) {
       assert.equal(result.valueOf(), CRVmintedForContributors[2]);
     })
     ;
@@ -369,8 +373,8 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CRPToken - TotalSupply | Post Collection", function() {
-    return CRPTokenInstance.totalSupply.call().then(function(result) {
+  it("Point - TotalSupply | Post Collection", function() {
+    return PointInstance.totalSupply.call().then(function(result) {
       var totalCRVMintedForContributors = CRVmintedForContributors.reduce(function(a, b) { return parseInt(a) + parseInt(b); }, 0);
       assert.equal(result.valueOf(), totalCRVMintedForContributors);
     })
@@ -404,14 +408,14 @@ contract('All', function(accounts) {
   it("CrowdvillaTokenSale - REIDAO | CRV Balance Post Collection", function() {
     return CRVTokenInstance.balanceOf("0x19BBe5157ffdf6Efa4C84810e7d2AE25832fF45D").then(function(result) {
       var totalCRVMintedForContributors = CRVmintedForContributors.reduce(function(a, b) { return parseInt(a) + parseInt(b); }, 0);
-      assert.equal(result.valueOf(), totalCRVMintedForContributors * 20/80);
+      assert.equal(result.valueOf(), totalCRVMintedForContributors * mgmtFee/(100-mgmtFee));
     })
     ;
   });
   it("CRVToken - TotalSupply | Post Collection", function() {
     return CRVTokenInstance.totalSupply.call().then(function(result) {
       var totalCRVMintedForContributors = CRVmintedForContributors.reduce(function(a, b) { return parseInt(a) + parseInt(b); }, 0);
-      assert.equal(result.valueOf(), totalCRVMintedForContributors * 100/80);
+      assert.equal(result.valueOf(), totalCRVMintedForContributors * 100/(100-mgmtFee));
     })
     ;
   });

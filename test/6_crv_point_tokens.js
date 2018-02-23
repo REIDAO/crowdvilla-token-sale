@@ -6,8 +6,8 @@
 var loggingEnabled = false;
 
 var CRVToken              = artifacts.require("./tokens/CRVToken.sol");
-var CRPToken              = artifacts.require("./tokens/CRPToken.sol");
-var CRVTokenInstance; var CRPTokenInstance;
+var Point                 = artifacts.require("./tokens/Point.sol");
+var CRVTokenInstance; var PointInstance;
 
 contract('All', function(accounts) {
   var owner = accounts[0];
@@ -28,10 +28,10 @@ contract('All', function(accounts) {
     })
     ;
   });
-  it("CRPToken - Deployment successful", function() {
-    return CRPToken.deployed()
+  it("Point - Deployment successful", function() {
+    return Point.deployed()
     .then(function(result) {
-      CRPTokenInstance = result;
+      PointInstance = result;
       assert.isNotNull(result.address, "Address is not empty: " + result.address);
     })
     ;
