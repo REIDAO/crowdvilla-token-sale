@@ -130,7 +130,7 @@ contract('All', function(accounts) {
     ;
   });
 
-  it("CrowdvillaTokenSale - Account #2 | Promised REI should be " + contributionInEther * 5 + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #2 | Promised REI should be " + contributionInEther * 5 + " REI", function() {
     return CrowdvillaTokenSaleInstance.getPromisedREITokenAmount(accounts[2])
     .then(function(result) {
       assert.equal(result.valueOf(), contributionInEther * 5 * Math.pow(10,8));
@@ -158,7 +158,7 @@ contract('All', function(accounts) {
     ;
   });
 
-  it("CrowdvillaTokenSale - Account #3 | Promised REI should be " + contributionInEther * 5 + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #3 | Promised REI should be " + contributionInEther * 5 + " REI", function() {
     return CrowdvillaTokenSaleInstance.getPromisedREITokenAmount(accounts[3])
     .then(function(result) {
       assert.equal(result.valueOf(), contributionInEther * 5 * Math.pow(10,8));
@@ -186,7 +186,7 @@ contract('All', function(accounts) {
     ;
   });
 
-  it("CrowdvillaTokenSale - Account #4 | Promised REI should be " + contributionInEther * 5 + " CRV", function() {
+  it("CrowdvillaTokenSale - Account #4 | Promised REI should be " + contributionInEther * 5 + " REI", function() {
     return CrowdvillaTokenSaleInstance.getPromisedREITokenAmount(accounts[4])
     .then(function(result) {
       assert.equal(result.valueOf(), contributionInEther * 5 * Math.pow(10,8));
