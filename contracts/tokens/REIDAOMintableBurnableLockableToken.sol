@@ -20,4 +20,12 @@ contract REIDAOMintableBurnableLockableToken is REIDAOMintableLockableToken, REI
   function removeHostedWallet(address _wallet) public ownerOnly {
     return super.removeHostedWallet(_wallet);
   }
+
+  /**
+   * @dev burns tokens, can only be done by hosted wallets
+   * @param _value uint256 the amount of tokens to be burned
+   */
+  function burn(uint256 _value) public canTransfer(msg.sender, _value) {
+    return super.burn(_value);
+  }
 }
