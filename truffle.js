@@ -14,9 +14,11 @@ var path = require("path");
 var bip39 = require("bip39");
 var hdkey = require('ethereumjs-wallet/hdkey');
 var ProviderEngine = require("web3-provider-engine");
+var CacheSubprovider = require("web3-provider-engine/subproviders/cache.js");
 var FiltersSubprovider = require('web3-provider-engine/subproviders/filters.js');
 var WalletSubprovider = require('web3-provider-engine/subproviders/wallet.js');
-var Web3Subprovider = require("web3-provider-engine/subproviders/web3.js");
+var NonceSubprovider = require("web3-provider-engine/subproviders/nonce-tracker.js");
+var FetchSubprovider = require("web3-provider-engine/subproviders/fetch.js");
 var Web3 = require("web3");
 
 var action = process.argv[2];
@@ -48,15 +50,17 @@ if (action == "migrate") {
     address = "0x" + wallet.getAddress().toString("hex");
     console.log("Deploying at " + url + " with " + address);
 
-    providerInstance.addProvider(new WalletSubprovider(wallet, {}));
+    providerInstance.addProvider(new CacheSubprovider());
     providerInstance.addProvider(new FiltersSubprovider());
-    providerInstance.addProvider(new Web3Subprovider(new Web3.providers.HttpProvider(url)));
+    providerInstance.addProvider(new NonceSubprovider());
+    providerInstance.addProvider(new WalletSubprovider(wallet, {}));
+    providerInstance.addProvider(new FetchSubprovider({ rpcUrl: url }));
     providerInstance.start();
   }
 }
 
-var gasPrice = 31000000000;
-var gasLimit = 6721975;
+var gasPrice = 41000000000;
+var gasLimit = 5000000;
 
 module.exports = {
   networks: {
