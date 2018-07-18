@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
 
-import './math/SafeMath.sol';
+import "./math/SafeMath.sol";
 import "./ownership/Owners.sol";
 import "./tokens/REIDAOMintableBurnableLockableToken.sol";
 import "./registries/AddressesEternalStorage.sol";
@@ -26,7 +26,7 @@ contract PointGeneration is Owners(true) {
    * @param       _eternalStorage AddressesEternalStorage the address of eternal storage
    */
   function PointGeneration(AddressesEternalStorage _eternalStorage) public {
-    defaultPlan = "default";
+    defaultPlan = "1";
     state = State.Active;
     eternalStorage = _eternalStorage;
     crvToken = REIDAOMintableBurnableLockableToken(eternalStorage.getEntry("CRVToken"));
@@ -38,7 +38,7 @@ contract PointGeneration is Owners(true) {
    * @dev external method
    */
   function () external {
-    generatePoint(defaultPlan, crvToken.balanceOf(msg.sender));
+    generatePoint(defaultPlan, crvToken.transferableTokens(msg.sender));
   }
 
   /**
@@ -46,7 +46,7 @@ contract PointGeneration is Owners(true) {
    * @dev external method
    */
   function generatePointPlan(bytes32 _plan) external {
-    generatePoint(_plan, crvToken.balanceOf(msg.sender));
+    generatePoint(_plan, crvToken.transferableTokens(msg.sender));
   }
 
   /**
@@ -58,26 +58,26 @@ contract PointGeneration is Owners(true) {
    * @param _plan bytes32 the name of the plan to be used to generate points
    * @param crvToLock uint total number of CRV tokens activated (to be locked)
    */
-  function generatePoint(bytes32 _plan, uint crvToLock) public payable {
+  function generatePoint(bytes32 _plan, uint crvToLock) public {
     require(state == State.Active);
     uint transferrableCRV = crvToken.transferableTokens(msg.sender);
     require (crvToLock <= transferrableCRV);
 
     pointGenerationConfig = PointGenerationConfig(eternalStorage.getEntry("PointGenerationConfig"));
     pointAllocationConfig = PointAllocationConfig(eternalStorage.getEntry("PointAllocationConfig"));
-    var (pointPerCrv, crvLockPeriod, initPct, subseqPct, subseqFreq, subseqFreqIntervalDays, isActive) = pointGenerationConfig.configs(_plan);
+    var (pointPerCrv, crvLockPeriod, initPct, subseqFreq, subseqFreqIntervalDays, isActive) = pointGenerationConfig.configs(_plan);
     require(isActive);
 
-    crvToken.lockTokens(msg.sender, crvToLock, now + crvLockPeriod);
-
     uint pointToMint = crvToLock.mul(pointPerCrv);
+    pointToMint = pointToMint.div(100);
     uint pointForTokenHolder = pointToMint.mul(pointAllocationConfig.getConfig("tokenHolder")).div(100);
 
+    crvToken.lockTokens(msg.sender, crvToLock, now + crvLockPeriod);
     //release immediate points allocation for token holder
     point.mint(msg.sender, pointForTokenHolder.mul(initPct).div(100));
 
     //release remaining points allocated for token holder in 5 batches.
-    uint pointForTokenHolderSubseq = pointForTokenHolder.mul(subseqPct).div(100);
+    uint pointForTokenHolderSubseq = pointForTokenHolder.mul((100-initPct)).div(subseqFreq).div(100);
     for (uint i=0; i<subseqFreq; i++) {
       point.mintAndLockTokens(msg.sender, pointForTokenHolderSubseq, now + (subseqFreqIntervalDays * (i+1)));
     }
@@ -98,6 +98,15 @@ contract PointGeneration is Owners(true) {
     point.mint(eternalStorage.getEntry("PointWalletCrowdvillaNpo"), pointForCrowdvillaNpo);
     point.mint(eternalStorage.getEntry("PointWalletCrowdvillaOps"), pointForCrowdvillaOps);
     point.mint(eternalStorage.getEntry("PointWalletReidao"), pointForReidao);
+  }
+
+  function getGeneratedPointsForTokenHolder(bytes32 _plan) public view returns (uint amount) {
+    PointGenerationConfig generation = PointGenerationConfig(eternalStorage.getEntry("PointGenerationConfig"));
+    var (pointPerCrv, crvLockPeriod, initPct, subseqFreq, subseqFreqIntervalDays, isActive) = generation.configs(_plan);
+    if (!isActive) return 0;
+
+    PointAllocationConfig allocation = PointAllocationConfig(eternalStorage.getEntry("PointAllocationConfig"));
+    return pointPerCrv.mul(allocation.getConfig("tokenHolder"));
   }
 
   /**
