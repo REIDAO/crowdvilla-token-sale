@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
-import './MintableToken.sol';
+import "./MintableToken.sol";
+
 
 contract REIDAOMintableToken is MintableToken {
 

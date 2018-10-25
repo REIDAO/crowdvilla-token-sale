@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
-import './BurnableToken.sol';
+import "./BurnableToken.sol";
+
 
 contract REIDAOBurnableToken is BurnableToken {
 
@@ -34,7 +35,7 @@ contract REIDAOBurnableToken is BurnableToken {
    * @dev checks if sender is hosted wallets
    */
   modifier hostedWalletsOnly {
-    require(hostedWallets[msg.sender]==true);
+    require(hostedWallets[msg.sender] == true);
     _;
   }
 }

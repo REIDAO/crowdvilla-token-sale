@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 import "./REIDAOMintableToken.sol";
+
 
 contract REIDAOMintableLockableToken is REIDAOMintableToken {
 
@@ -26,7 +27,10 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    * @param _to address The address which you want to transfer to
    * @param _value uint256 the amount of tokens to be transferred
    */
-  function transferFrom(address _from, address _to, uint _value) public canTransfer(msg.sender, _value) returns (bool) {
+  function transferFrom(
+    address _from,
+    address _to,
+    uint _value) public canTransfer(msg.sender, _value) returns (bool) {
     return super.transferFrom(_from, _to, _value);
   }
 
@@ -98,9 +102,9 @@ contract REIDAOMintableLockableToken is REIDAOMintableToken {
    */
   modifier canTransfer(address _sender, uint256 _value) {
     uint256 transferableTokensAmt = transferableTokens(_sender);
-    require (_value <= transferableTokensAmt);
+    require(_value <= transferableTokensAmt);
     // delete locks if all locks are cleared
-    if (transferableTokensAmt == balanceOf(_sender) && getTokenLocksCount(_sender)>0) {
+    if (transferableTokensAmt == balanceOf(_sender) && getTokenLocksCount(_sender) > 0) {
       delete locks[_sender];
     }
     _;

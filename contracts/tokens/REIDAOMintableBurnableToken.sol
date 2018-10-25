@@ -1,7 +1,8 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
-import './REIDAOMintableToken.sol';
-import './REIDAOBurnableToken.sol';
+import "./REIDAOMintableToken.sol";
+import "./REIDAOBurnableToken.sol";
+
 
 contract REIDAOMintableBurnableToken is REIDAOMintableToken, REIDAOBurnableToken {
 

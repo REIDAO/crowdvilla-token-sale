@@ -1,8 +1,8 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 
-import './ERC20Basic.sol';
-import '../math/SafeMath.sol';
+import "./ERC20Basic.sol";
+import "../math/SafeMath.sol";
 
 
 /**
@@ -12,7 +12,7 @@ import '../math/SafeMath.sol';
 contract BasicToken is ERC20Basic {
   using SafeMath for uint256;
 
-  mapping(address => uint256) balances;
+  mapping(address => uint256) internal balances;
 
   /**
    * @dev Fix for the ERC20 short address attack.
@@ -34,7 +34,7 @@ contract BasicToken is ERC20Basic {
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     balances[_to] = balances[_to].add(_value);
-    Transfer(msg.sender, _to, _value);
+    emit Transfer(msg.sender, _to, _value);
     return true;
   }
 

@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 import "../ownership/Owners.sol";
+
 
 contract AddressesEternalStorage is Owners(true) {
 
@@ -25,7 +26,7 @@ contract AddressesEternalStorage is Owners(true) {
    */
   function addEntry(bytes32 _key, address _value) public ownerOnly {
     addressStorage[_key] = _value;
-    EntryAdded( _key, _value);
+    emit EntryAdded(_key, _value);
   }
 
   /**
@@ -33,9 +34,9 @@ contract AddressesEternalStorage is Owners(true) {
    * @param _key bytes32 the record identifier to be removed
    */
   function deleteEntry(bytes32 _key) public ownerOnly {
-    if (addressStorage[_key]!=0x0) {
+    if (addressStorage[_key] != 0x0) {
       addressStorage[_key] = 0x0;
-      EntryDeleted(_key);
+      emit EntryDeleted(_key);
     }
   }
 }

@@ -1,4 +1,5 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
+
 
 contract Owners {
 
@@ -13,7 +14,7 @@ contract Owners {
    * @dev initializes contract
    * @param withDeployer bool indicates whether deployer is part of owners
    */
-  function Owners(bool withDeployer) public {
+  constructor(bool withDeployer) public {
     if (withDeployer) {
       ownersCount++;
       owners[msg.sender] = true;
@@ -31,7 +32,7 @@ contract Owners {
     require(_address != address(0));
     owners[_address] = true;
     ownersCount++;
-    OwnerAdded(_address);
+    emit OwnerAdded(_address);
   }
 
   /**
@@ -42,7 +43,7 @@ contract Owners {
     require(owners[_address] == true);
     owners[_address] = false;
     ownersCount--;
-    OwnerRemoved(_address);
+    emit OwnerRemoved(_address);
   }
 
   /**

@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
-import './BasicToken.sol';
+import "./BasicToken.sol";
+
 
 /**
  * @title Burnable Token
@@ -22,6 +23,7 @@ contract BurnableToken is BasicToken {
         address burner = msg.sender;
         balances[burner] = balances[burner].sub(_value);
         totalSupply = totalSupply.sub(_value);
-        Burn(burner, _value);
+        emit Burn(burner, _value);
+        emit Transfer(burner, address(0), _value);
     }
 }

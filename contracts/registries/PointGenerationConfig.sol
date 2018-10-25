@@ -1,10 +1,11 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 import "../ownership/Owners.sol";
 
+
 contract PointGenerationConfig is Owners(true) {
 
-  struct config {
+  struct Config {
     uint pointPerCrv;
     uint crvLockPeriod;
     uint initPct;
@@ -13,14 +14,21 @@ contract PointGenerationConfig is Owners(true) {
     bool isActive;
   }
 
-  event ConfigAdded(bytes32 plan, uint pointPerCrv, uint crvLockPeriod, uint initPct, uint subseqFreq, uint subseqFreqIntervalDays);
+  event ConfigAdded(
+    bytes32 plan,
+    uint pointPerCrv,
+    uint crvLockPeriod,
+    uint initPct,
+    uint subseqFreq,
+    uint subseqFreqIntervalDays
+  );
 
-  mapping(bytes32 => config) public configs;
+  mapping(bytes32 => Config) public configs;
 
   /**
    * @dev initializes contract with default plan
    */
-  function PointGenerationConfig() public {
+  constructor() public {
     addConfig("1", 100, 30 days, 50, 1, 30 days, true);
     addConfig("3", 375, 90 days, 50, 3, 30 days, true);
     addConfig("6", 900, 180 days, 50, 6, 30 days, true);
@@ -44,13 +52,13 @@ contract PointGenerationConfig is Owners(true) {
     uint _subseqFreq,
     uint _subseqFreqIntervalDays,
     bool _isActive) public ownerOnly {
-      configs[_plan].pointPerCrv = _pointPerCrv;
-      configs[_plan].crvLockPeriod = _crvLockPeriod;
-      configs[_plan].initPct = _initPct;
-      configs[_plan].subseqFreq = _subseqFreq;
-      configs[_plan].subseqFreqIntervalDays = _subseqFreqIntervalDays;
-      configs[_plan].isActive = _isActive;
-      ConfigAdded(_plan, _pointPerCrv, _crvLockPeriod, _initPct, _subseqFreq, _subseqFreqIntervalDays);
+    configs[_plan].pointPerCrv = _pointPerCrv;
+    configs[_plan].crvLockPeriod = _crvLockPeriod;
+    configs[_plan].initPct = _initPct;
+    configs[_plan].subseqFreq = _subseqFreq;
+    configs[_plan].subseqFreqIntervalDays = _subseqFreqIntervalDays;
+    configs[_plan].isActive = _isActive;
+    emit ConfigAdded(_plan, _pointPerCrv, _crvLockPeriod, _initPct, _subseqFreq, _subseqFreqIntervalDays);
   }
 
   /**

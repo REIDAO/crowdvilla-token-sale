@@ -1,9 +1,8 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 
 
-import './StandardToken.sol';
-import '../ownership/Owners.sol';
-
+import "./StandardToken.sol";
+import "../ownership/Owners.sol";
 
 
 /**
@@ -12,14 +11,12 @@ import '../ownership/Owners.sol';
  * @dev Issue: * https://github.com/OpenZeppelin/zeppelin-solidity/issues/120
  * Based on code by TokenMarketNet: https://github.com/TokenMarketNet/ico/blob/master/contracts/MintableToken.sol
  */
-
 contract MintableToken is StandardToken, Owners(true) {
   event Mint(address indexed to, uint256 amount);
   event MintFinished();
   event MintStarted();
 
   bool public mintingFinished = false;
-
 
   modifier canMint() {
     require(!mintingFinished);
@@ -32,25 +29,17 @@ contract MintableToken is StandardToken, Owners(true) {
    * @param _amount The amount of tokens to mint.
    * @return A boolean that indicates if the operation was successful.
    */
-  function mint(address _to, uint256 _amount) ownerOnly canMint onlyPayloadSize(2 * 32) external returns (bool) {
+  function mint(address _to, uint256 _amount) external ownerOnly canMint onlyPayloadSize(2 * 32) returns (bool) {
     return internalMint(_to, _amount);
-  }
-
-  function internalMint(address _to, uint256 _amount) internal returns (bool) {
-    totalSupply = totalSupply.add(_amount);
-    balances[_to] = balances[_to].add(_amount);
-    Mint(_to, _amount);
-    Transfer(address(0), _to, _amount);
-    return true;
   }
 
   /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
    */
-  function finishMinting() ownerOnly canMint public returns (bool) {
+  function finishMinting() public ownerOnly canMint returns (bool) {
     mintingFinished = true;
-    MintFinished();
+    emit MintFinished();
     return true;
   }
 
@@ -58,9 +47,17 @@ contract MintableToken is StandardToken, Owners(true) {
    * @dev Function to start minting new tokens.
    * @return True if the operation was successful.
    */
-  function startMinting() ownerOnly public returns (bool) {
+  function startMinting() public ownerOnly returns (bool) {
     mintingFinished = false;
-    MintStarted();
+    emit MintStarted();
+    return true;
+  }
+
+  function internalMint(address _to, uint256 _amount) internal returns (bool) {
+    totalSupply = totalSupply.add(_amount);
+    balances[_to] = balances[_to].add(_amount);
+    emit Mint(_to, _amount);
+    emit Transfer(address(0), _to, _amount);
     return true;
   }
 }
